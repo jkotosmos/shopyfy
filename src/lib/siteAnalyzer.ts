@@ -7,8 +7,9 @@
 // ссылки на бесплатные инструменты, чтобы проверить фактические показатели.
 
 import { makeRng, pick, pickMany, randInt } from "./seed";
-import { detectNiche, type Niche } from "./niches";
+import { detectNiche, nicheLabel, type Niche } from "./niches";
 import type { ResearchLink } from "./trends";
+import { getLang, type Lang } from "./i18n";
 
 export interface SiteOverview {
   domain: string;
@@ -86,91 +87,110 @@ export function normalizeDomain(rawInput: string): string {
   return value.includes(".") ? value : `${value}.com`;
 }
 
-const COUNTRIES = [
-  { name: "США", flag: "🇺🇸" },
-  { name: "Великобритания", flag: "🇬🇧" },
-  { name: "Германия", flag: "🇩🇪" },
-  { name: "Канада", flag: "🇨🇦" },
-  { name: "Франция", flag: "🇫🇷" },
-  { name: "Австралия", flag: "🇦🇺" },
-  { name: "Бразилия", flag: "🇧🇷" },
-  { name: "Индия", flag: "🇮🇳" },
-  { name: "Испания", flag: "🇪🇸" },
-  { name: "Италия", flag: "🇮🇹" },
-  { name: "Нидерланды", flag: "🇳🇱" },
-  { name: "Польша", flag: "🇵🇱" },
-  { name: "Мексика", flag: "🇲🇽" },
-  { name: "Япония", flag: "🇯🇵" },
-  { name: "ОАЭ", flag: "🇦🇪" },
-] as const;
+const COUNTRY_FLAGS = ["🇺🇸", "🇬🇧", "🇩🇪", "🇨🇦", "🇫🇷", "🇦🇺", "🇧🇷", "🇮🇳", "🇪🇸", "🇮🇹", "🇳🇱", "🇵🇱", "🇲🇽", "🇯🇵", "🇦🇪"];
+const COUNTRY_NAMES: Record<Lang, string[]> = {
+  ru: ["США", "Великобритания", "Германия", "Канада", "Франция", "Австралия", "Бразилия", "Индия", "Испания", "Италия", "Нидерланды", "Польша", "Мексика", "Япония", "ОАЭ"],
+  en: ["United States", "United Kingdom", "Germany", "Canada", "France", "Australia", "Brazil", "India", "Spain", "Italy", "Netherlands", "Poland", "Mexico", "Japan", "UAE"],
+};
+function countries(lang: Lang) {
+  return COUNTRY_FLAGS.map((flag, i) => ({ flag, name: COUNTRY_NAMES[lang][i] }));
+}
 
-const TRAFFIC_CHANNEL_RANGES: [string, [number, number]][] = [
-  ["Прямые заходы", [22, 46]],
-  ["Органический поиск", [20, 42]],
-  ["Платный поиск", [3, 16]],
-  ["Соцсети", [5, 22]],
-  ["Реферальные переходы", [2, 11]],
-  ["Медийная реклама", [1, 5]],
-  ["Email-рассылки", [1, 6]],
-];
+const CHANNEL_KEYS = ["direct", "organic", "paid", "social", "referral", "display", "email"] as const;
+const TRAFFIC_CHANNEL_RANGES: Record<(typeof CHANNEL_KEYS)[number], [number, number]> = {
+  direct: [22, 46], organic: [20, 42], paid: [3, 16], social: [5, 22], referral: [2, 11], display: [1, 5], email: [1, 6],
+};
+const TRAFFIC_CHANNEL_LABELS: Record<Lang, Record<(typeof CHANNEL_KEYS)[number], string>> = {
+  ru: { direct: "Прямые заходы", organic: "Органический поиск", paid: "Платный поиск", social: "Соцсети", referral: "Реферальные переходы", display: "Медийная реклама", email: "Email-рассылки" },
+  en: { direct: "Direct", organic: "Organic Search", paid: "Paid Search", social: "Social", referral: "Referrals", display: "Display Ads", email: "Email" },
+};
 
-const SOCIAL_CHANNEL_RANGES: [string, [number, number]][] = [
-  ["YouTube", [15, 38]],
-  ["Facebook", [14, 34]],
-  ["Instagram", [10, 28]],
-  ["TikTok", [6, 24]],
-  ["Pinterest", [4, 16]],
-  ["X (Twitter)", [3, 12]],
-  ["Reddit", [2, 10]],
-  ["ВКонтакте", [1, 8]],
-];
+const SOCIAL_KEYS = ["youtube", "facebook", "instagram", "tiktok", "pinterest", "x", "reddit", "vk"] as const;
+const SOCIAL_CHANNEL_RANGES: Record<(typeof SOCIAL_KEYS)[number], [number, number]> = {
+  youtube: [15, 38], facebook: [14, 34], instagram: [10, 28], tiktok: [6, 24], pinterest: [4, 16], x: [3, 12], reddit: [2, 10], vk: [1, 8],
+};
+const SOCIAL_CHANNEL_LABELS: Record<Lang, Record<(typeof SOCIAL_KEYS)[number], string>> = {
+  ru: { youtube: "YouTube", facebook: "Facebook", instagram: "Instagram", tiktok: "TikTok", pinterest: "Pinterest", x: "X (Twitter)", reddit: "Reddit", vk: "ВКонтакте" },
+  en: { youtube: "YouTube", facebook: "Facebook", instagram: "Instagram", tiktok: "TikTok", pinterest: "Pinterest", x: "X (Twitter)", reddit: "Reddit", vk: "VK" },
+};
 
-function distributeExact100(rng: () => number, ranges: [string, [number, number]][]): ShareRow[] {
-  const raw = ranges.map(([label, [lo, hi]]) => ({ label, val: lo + rng() * (hi - lo) }));
+function distributeExact100<K extends string>(rng: () => number, ranges: Record<K, [number, number]>, labels: Record<K, string>): ShareRow[] {
+  const keys = Object.keys(ranges) as K[];
+  const raw = keys.map((key) => ({ key, val: ranges[key][0] + rng() * (ranges[key][1] - ranges[key][0]) }));
   const sum = raw.reduce((acc, r) => acc + r.val, 0);
-  const rows = raw.map((r) => ({ label: r.label, pct: Math.round((r.val / sum) * 100) }));
+  const rows = raw.map((r) => ({ label: labels[r.key], pct: Math.round((r.val / sum) * 100) }));
   const diff = 100 - rows.reduce((acc, r) => acc + r.pct, 0);
   rows[0].pct += diff;
   return rows.sort((a, b) => b.pct - a.pct);
 }
 
-const NICHE_SEARCH_TERM: Record<string, string> = {
-  electronics: "гаджет",
-  beauty: "уходовую косметику",
-  home: "товар для дома",
-  fitness: "фитнес-аксессуар",
-  pet: "товар для питомца",
-  kids: "детский товар",
-  outdoors: "туристическое снаряжение",
-  fashion: "аксессуар",
-  auto: "автотовар",
-  general: "товар",
+const NICHE_SEARCH_TERM: Record<Lang, Record<string, string>> = {
+  ru: {
+    electronics: "гаджет", beauty: "уходовую косметику", home: "товар для дома", fitness: "фитнес-аксессуар",
+    pet: "товар для питомца", kids: "детский товар", outdoors: "туристическое снаряжение", fashion: "аксессуар",
+    auto: "автотовар", general: "товар",
+  },
+  en: {
+    electronics: "gadget", beauty: "skincare", home: "home goods", fitness: "fitness gear",
+    pet: "pet supplies", kids: "kids gear", outdoors: "camping gear", fashion: "accessories",
+    auto: "car accessories", general: "product",
+  },
 };
 
-const ORGANIC_TEMPLATES: ((brand: string, term: string) => string)[] = [
-  (b) => b,
-  (b) => `${b} официальный сайт`,
-  (b) => `${b} отзывы`,
-  (b) => `${b} каталог`,
-  (_b, t) => `купить ${t}`,
-  (_b, t) => `${t} цена`,
-  (b) => `${b} интернет-магазин`,
-  (_b, t) => `${t} с доставкой`,
-  (b) => `${b} акции`,
-  (_b, t) => `лучший ${t}`,
-];
+const ORGANIC_TEMPLATES: Record<Lang, ((brand: string, term: string) => string)[]> = {
+  ru: [
+    (b) => b,
+    (b) => `${b} официальный сайт`,
+    (b) => `${b} отзывы`,
+    (b) => `${b} каталог`,
+    (_b, t) => `купить ${t}`,
+    (_b, t) => `${t} цена`,
+    (b) => `${b} интернет-магазин`,
+    (_b, t) => `${t} с доставкой`,
+    (b) => `${b} акции`,
+    (_b, t) => `лучший ${t}`,
+  ],
+  en: [
+    (b) => b,
+    (b) => `${b} official site`,
+    (b) => `${b} reviews`,
+    (b) => `${b} catalog`,
+    (_b, t) => `buy ${t}`,
+    (_b, t) => `${t} price`,
+    (b) => `${b} online store`,
+    (_b, t) => `${t} free shipping`,
+    (b) => `${b} promo code`,
+    (_b, t) => `best ${t}`,
+  ],
+};
 
-const PAID_TEMPLATES: ((brand: string, term: string) => string)[] = [
-  (_b, t) => `купить ${t} недорого`,
-  (_b, t) => `${t} со скидкой`,
-  (_b, t) => `${t} интернет-магазин`,
-  (b) => `${b} промокод`,
-  (_b, t) => `быстрая доставка — ${t}`,
-  (_b, t) => `заказать ${t} онлайн`,
-  (b) => `${b} скидка`,
-];
+const PAID_TEMPLATES: Record<Lang, ((brand: string, term: string) => string)[]> = {
+  ru: [
+    (_b, t) => `купить ${t} недорого`,
+    (_b, t) => `${t} со скидкой`,
+    (_b, t) => `${t} интернет-магазин`,
+    (b) => `${b} промокод`,
+    (_b, t) => `быстрая доставка — ${t}`,
+    (_b, t) => `заказать ${t} онлайн`,
+    (b) => `${b} скидка`,
+  ],
+  en: [
+    (_b, t) => `cheap ${t}`,
+    (_b, t) => `${t} discount`,
+    (_b, t) => `${t} online store`,
+    (b) => `${b} coupon code`,
+    (_b, t) => `fast shipping ${t}`,
+    (_b, t) => `order ${t} online`,
+    (b) => `${b} sale`,
+  ],
+};
 
-export function formatCompact(n: number): string {
+export function formatCompact(n: number, lang: Lang = "ru"): string {
+  if (lang === "en") {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}K`;
+    return `${Math.round(n)}`;
+  }
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)} млн`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)} тыс.`;
   return `${Math.round(n)}`;
@@ -183,6 +203,7 @@ function buildKeywordRows(
   term: string,
   monthlyVisits: number,
   paid: boolean,
+  lang: Lang,
 ): KeywordRow[] {
   const chosen = pickMany(rng, templates, paid ? 5 : 6);
   let remaining = paid ? randInt(rng, 8, 22) : randInt(rng, 20, 45);
@@ -193,7 +214,7 @@ function buildKeywordRows(
     return {
       keyword: tmpl(brand, term),
       trafficSharePct: share,
-      monthlyVisitsEstimate: formatCompact(monthlyVisits * (share / 100)),
+      monthlyVisitsEstimate: formatCompact(monthlyVisits * (share / 100), lang),
       cpc: paid ? `$${(0.15 + rng() * 2.35).toFixed(2)}` : undefined,
     };
   });
@@ -218,25 +239,44 @@ const SIMILAR_SITES_BY_NICHE: Record<string, string[]> = {
   general: ["amazon.com", "ebay.com", "walmart.com", "aliexpress.com", "temu.com"],
 };
 
-const AUDIENCE_INTERESTS_POOL = [
-  "Электронная коммерция", "Соцсети и мессенджеры", "Новости и медиа", "Стриминг видео",
-  "Финансы и платежи", "Путешествия", "Игры", "Образование", "Поисковые системы",
-  "Мода и стиль", "Здоровье и фитнес", "Кулинария и рецепты",
-];
+const AUDIENCE_INTERESTS_POOL: Record<Lang, string[]> = {
+  ru: [
+    "Электронная коммерция", "Соцсети и мессенджеры", "Новости и медиа", "Стриминг видео",
+    "Финансы и платежи", "Путешествия", "Игры", "Образование", "Поисковые системы",
+    "Мода и стиль", "Здоровье и фитнес", "Кулинария и рецепты",
+  ],
+  en: [
+    "E-commerce", "Social Media & Messaging", "News & Media", "Video Streaming",
+    "Finance & Payments", "Travel", "Gaming", "Education", "Search Engines",
+    "Fashion & Style", "Health & Fitness", "Cooking & Recipes",
+  ],
+};
 
-const PLATFORM_POOL = ["Shopify", "Shopify", "WooCommerce (WordPress)", "WooCommerce (WordPress)", "BigCommerce", "Magento", "Wix", "Tilda", "Самописное решение"];
+const PLATFORM_POOL: Record<Lang, string[]> = {
+  ru: ["Shopify", "Shopify", "WooCommerce (WordPress)", "WooCommerce (WordPress)", "BigCommerce", "Magento", "Wix", "Tilda", "Самописное решение"],
+  en: ["Shopify", "Shopify", "WooCommerce (WordPress)", "WooCommerce (WordPress)", "BigCommerce", "Magento", "Wix", "Squarespace", "Custom-built"],
+};
 const ANALYTICS_POOL = ["Google Analytics 4", "Google Tag Manager", "Yandex.Metrica", "Hotjar", "Microsoft Clarity"];
 const AD_PIXELS_POOL = ["Meta Pixel", "TikTok Pixel", "Google Ads Tag", "Pinterest Tag", "Snapchat Pixel"];
 const REVIEWS_POOL = ["Judge.me", "Loox", "Yotpo", "Trustpilot Reviews"];
-const CHAT_POOL = ["Tidio", "Intercom", "Re:amaze", "чат в Facebook Messenger"];
+const CHAT_POOL: Record<Lang, string[]> = {
+  ru: ["Tidio", "Intercom", "Re:amaze", "чат в Facebook Messenger"],
+  en: ["Tidio", "Intercom", "Re:amaze", "Facebook Messenger chat"],
+};
 const PAYMENTS_POOL = ["Shopify Payments", "PayPal", "Stripe", "Klarna"];
 
+const TECH_CATEGORY_LABELS: Record<Lang, { platform: string; analytics: string; pixels: string; reviews: string; chat: string; payments: string }> = {
+  ru: { platform: "Платформа", analytics: "Аналитика", pixels: "Пиксели и реклама", reviews: "Отзывы", chat: "Онлайн-чат", payments: "Оплата" },
+  en: { platform: "Platform", analytics: "Analytics", pixels: "Ad Pixels", reviews: "Reviews", chat: "Live Chat", payments: "Payments" },
+};
+
 export function analyzeSite(rawInput: string): SiteReport {
+  const lang = getLang();
   const domain = normalizeDomain(rawInput);
   const brand = domain.split(".")[0];
   const brandDisplay = brand.charAt(0).toUpperCase() + brand.slice(1);
   const niche = detectNiche(domain);
-  const searchTerm = NICHE_SEARCH_TERM[niche.id] ?? "товар";
+  const searchTerm = NICHE_SEARCH_TERM[lang][niche.id] ?? NICHE_SEARCH_TERM[lang].general;
   const rng = makeRng(domain);
 
   const visitsBase = randInt(rng, 12, 980);
@@ -246,7 +286,8 @@ export function analyzeSite(rawInput: string): SiteReport {
   const countryRank = Math.max(5, Math.round(globalRank * (randInt(rng, 12, 38) / 100)));
   const categoryRank = randInt(rng, 4, 460);
   const visitsChangePct = randInt(rng, -22, 46);
-  const country = pick(rng, COUNTRIES);
+  const countryList = countries(lang);
+  const country = pick(rng, countryList);
 
   const totalSeconds = randInt(rng, 48, 430);
   const avgVisitDuration = `${String(Math.floor(totalSeconds / 60)).padStart(2, "0")}:${String(totalSeconds % 60).padStart(2, "0")}`;
@@ -254,24 +295,24 @@ export function analyzeSite(rawInput: string): SiteReport {
   const bounceRatePct = randInt(rng, 27, 74);
 
   const overview: SiteOverview = {
-    domain, category: niche.label, globalRank, countryRank, categoryRank,
+    domain, category: nicheLabel(niche, lang), globalRank, countryRank, categoryRank,
     country: `${country.flag} ${country.name}`, monthlyVisits, visitsChangePct,
     avgVisitDuration, pagesPerVisit, bounceRatePct,
   };
 
-  const trafficSources = distributeExact100(rng, TRAFFIC_CHANNEL_RANGES);
-  const socialShares = distributeExact100(rng, SOCIAL_CHANNEL_RANGES);
+  const trafficSources = distributeExact100(rng, TRAFFIC_CHANNEL_RANGES, TRAFFIC_CHANNEL_LABELS[lang]);
+  const socialShares = distributeExact100(rng, SOCIAL_CHANNEL_RANGES, SOCIAL_CHANNEL_LABELS[lang]);
 
-  const countryPicks = pickMany(rng, COUNTRIES, 5);
+  const countryPicks = pickMany(rng, countryList, 5);
   const rawCountryVals = countryPicks.map((_, i) => (i === 0 ? 30 + rng() * 20 : Math.max(2, 22 - i * 4 + rng() * 8)));
   const rawSum = rawCountryVals.reduce((a, b) => a + b, 0);
   const targetTop5Sum = 58 + rng() * 30;
   const countryShares = rawCountryVals.map((v) => Math.round((v / rawSum) * targetTop5Sum));
-  const countries: CountryShare[] = countryPicks.map((c, i) => ({ label: c.name, flag: c.flag, pct: countryShares[i] }));
+  const countryRows: CountryShare[] = countryPicks.map((c, i) => ({ label: c.name, flag: c.flag, pct: countryShares[i] }));
   const otherCountriesPct = Math.max(1, 100 - countryShares.reduce((a, b) => a + b, 0));
 
-  const organicKeywords = buildKeywordRows(rng, ORGANIC_TEMPLATES, brandDisplay, searchTerm, monthlyVisits, false);
-  const paidKeywords = buildKeywordRows(rng, PAID_TEMPLATES, brandDisplay, searchTerm, monthlyVisits, true);
+  const organicKeywords = buildKeywordRows(rng, ORGANIC_TEMPLATES[lang], brandDisplay, searchTerm, monthlyVisits, false, lang);
+  const paidKeywords = buildKeywordRows(rng, PAID_TEMPLATES[lang], brandDisplay, searchTerm, monthlyVisits, true, lang);
 
   const totalBacklinks = randInt(rng, 850, 2_400_000);
   const referringDomains = Math.max(24, Math.round(totalBacklinks / randInt(rng, 9, 45)));
@@ -285,15 +326,16 @@ export function analyzeSite(rawInput: string): SiteReport {
     .map((d) => ({ domain: d, affinityPct: randInt(rng, 38, 91) }))
     .sort((a, b) => b.affinityPct - a.affinityPct);
 
-  const audienceInterests = pickMany(rng, AUDIENCE_INTERESTS_POOL, 5);
+  const audienceInterests = pickMany(rng, AUDIENCE_INTERESTS_POOL[lang], 5);
 
+  const techLabels = TECH_CATEGORY_LABELS[lang];
   const techStack: TechStackItem[] = [
-    { category: "Платформа", name: pick(rng, PLATFORM_POOL) },
-    { category: "Аналитика", name: pickMany(rng, ANALYTICS_POOL, 2).join(", ") },
-    { category: "Пиксели и реклама", name: pickMany(rng, AD_PIXELS_POOL, 2).join(", ") },
-    { category: "Отзывы", name: pick(rng, REVIEWS_POOL) },
-    { category: "Онлайн-чат", name: pick(rng, CHAT_POOL) },
-    { category: "Оплата", name: pickMany(rng, PAYMENTS_POOL, 2).join(", ") },
+    { category: techLabels.platform, name: pick(rng, PLATFORM_POOL[lang]) },
+    { category: techLabels.analytics, name: pickMany(rng, ANALYTICS_POOL, 2).join(", ") },
+    { category: techLabels.pixels, name: pickMany(rng, AD_PIXELS_POOL, 2).join(", ") },
+    { category: techLabels.reviews, name: pick(rng, REVIEWS_POOL) },
+    { category: techLabels.chat, name: pick(rng, CHAT_POOL[lang]) },
+    { category: techLabels.payments, name: pickMany(rng, PAYMENTS_POOL, 2).join(", ") },
   ];
 
   const rankFactor = Math.max(0, 100 - Math.log10(Math.max(globalRank, 10)) * 14);
@@ -301,54 +343,48 @@ export function analyzeSite(rawInput: string): SiteReport {
   const seoHealthScore = Math.round(Math.min(97, Math.max(8, rankFactor * 0.5 + engagementFactor * 0.5)));
 
   return {
-    domain, niche, overview, trafficSources, countries, otherCountriesPct,
+    domain, niche, overview, trafficSources, countries: countryRows, otherCountriesPct,
     organicKeywords, paidKeywords, backlinks, socialShares, similarSites,
     audienceInterests, techStack, seoHealthScore,
   };
 }
 
-export function buildSiteResearchLinks(domain: string): ResearchLink[] {
+const RESEARCH_LINK_TEXT: Record<Lang, { label: string; platform: string; hint: string }[]> = {
+  ru: [
+    { label: "SimilarWeb", platform: "SimilarWeb", hint: "Реальный бесплатный обзор трафика этого сайта" },
+    { label: "Google Trends", platform: "Google Trends", hint: "Динамика интереса к бренду в поиске" },
+    { label: "Ahrefs Backlink Checker", platform: "Ahrefs", hint: "Бесплатная проверка бэклинков и рефералов" },
+    { label: "SEMrush — обзор домена", platform: "SEMrush", hint: "Органические и платные ключевые слова" },
+    { label: "BuiltWith", platform: "BuiltWith", hint: "Реальный технологический стек сайта" },
+    { label: "Meta Ad Library", platform: "Facebook/Instagram Ads", hint: "Какую рекламу сейчас крутит этот бренд" },
+    { label: "PageSpeed Insights", platform: "Google PageSpeed", hint: "Реальная скорость загрузки и Core Web Vitals" },
+    { label: "WHOIS-запись", platform: "Who.is", hint: "Регистрация и возраст домена" },
+  ],
+  en: [
+    { label: "SimilarWeb", platform: "SimilarWeb", hint: "A real, free traffic overview for this site" },
+    { label: "Google Trends", platform: "Google Trends", hint: "Search interest in the brand over time" },
+    { label: "Ahrefs Backlink Checker", platform: "Ahrefs", hint: "Free backlink and referring-domain check" },
+    { label: "SEMrush — domain overview", platform: "SEMrush", hint: "Organic and paid keywords" },
+    { label: "BuiltWith", platform: "BuiltWith", hint: "The site's real technology stack" },
+    { label: "Meta Ad Library", platform: "Facebook/Instagram Ads", hint: "What ads this brand is running right now" },
+    { label: "PageSpeed Insights", platform: "Google PageSpeed", hint: "Real load speed and Core Web Vitals" },
+    { label: "WHOIS record", platform: "Who.is", hint: "Domain registration and age" },
+  ],
+};
+
+const RESEARCH_LINK_URLS = (domain: string, enc: string): string[] => [
+  `https://www.similarweb.com/website/${enc}/`,
+  `https://trends.google.com/trends/explore?q=${enc}`,
+  `https://ahrefs.com/backlink-checker/?input=${enc}&mode=domain`,
+  `https://www.semrush.com/analytics/overview/?q=${enc}&searchType=domain`,
+  `https://builtwith.com/${enc}`,
+  `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&q=${enc}&search_type=keyword_unordered`,
+  `https://pagespeed.web.dev/report?url=${encodeURIComponent(`https://${domain}`)}`,
+  `https://who.is/whois/${enc}`,
+];
+
+export function buildSiteResearchLinks(domain: string, lang: Lang = "ru"): ResearchLink[] {
   const enc = encodeURIComponent(domain);
-  return [
-    {
-      label: "SimilarWeb", platform: "SimilarWeb",
-      url: `https://www.similarweb.com/website/${enc}/`,
-      hint: "Реальный бесплатный обзор трафика этого сайта",
-    },
-    {
-      label: "Google Trends", platform: "Google Trends",
-      url: `https://trends.google.com/trends/explore?q=${enc}`,
-      hint: "Динамика интереса к бренду в поиске",
-    },
-    {
-      label: "Ahrefs Backlink Checker", platform: "Ahrefs",
-      url: `https://ahrefs.com/backlink-checker/?input=${enc}&mode=domain`,
-      hint: "Бесплатная проверка бэклинков и рефералов",
-    },
-    {
-      label: "SEMrush — обзор домена", platform: "SEMrush",
-      url: `https://www.semrush.com/analytics/overview/?q=${enc}&searchType=domain`,
-      hint: "Органические и платные ключевые слова",
-    },
-    {
-      label: "BuiltWith", platform: "BuiltWith",
-      url: `https://builtwith.com/${enc}`,
-      hint: "Реальный технологический стек сайта",
-    },
-    {
-      label: "Meta Ad Library", platform: "Facebook/Instagram Ads",
-      url: `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&q=${enc}&search_type=keyword_unordered`,
-      hint: "Какую рекламу сейчас крутит этот бренд",
-    },
-    {
-      label: "PageSpeed Insights", platform: "Google PageSpeed",
-      url: `https://pagespeed.web.dev/report?url=${encodeURIComponent(`https://${domain}`)}`,
-      hint: "Реальная скорость загрузки и Core Web Vitals",
-    },
-    {
-      label: "WHOIS-запись", platform: "Who.is",
-      url: `https://who.is/whois/${enc}`,
-      hint: "Регистрация и возраст домена",
-    },
-  ];
+  const urls = RESEARCH_LINK_URLS(domain, enc);
+  return RESEARCH_LINK_TEXT[lang].map((entry, i) => ({ ...entry, url: urls[i] }));
 }

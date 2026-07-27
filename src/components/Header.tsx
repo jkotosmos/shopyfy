@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Container, LinkButton } from "./ui";
+import { useLanguage, type Lang } from "../lib/i18n";
 
 function Logo({ onClick }: { onClick?: () => void }) {
   return (
@@ -14,17 +15,35 @@ function Logo({ onClick }: { onClick?: () => void }) {
   );
 }
 
-const NAV = [
-  { to: "/store-builder", label: "Конструктор магазина" },
-  { to: "/trends", label: "Поиск трендов" },
-  { to: "/tools/site-analyzer", label: "SEO-анализ сайта" },
-  { to: "/tools/profit-calculator", label: "Калькулятор маржи" },
-  { to: "/tools/ad-copy", label: "Тексты для рекламы" },
-  { to: "/saved", label: "Сохранённое" },
+function LanguageToggle({ className = "" }: { className?: string }) {
+  const { lang, setLang, t } = useLanguage();
+  const other: Lang = lang === "ru" ? "en" : "ru";
+  return (
+    <button
+      type="button"
+      onClick={() => setLang(other)}
+      title={t("lang.toggleLabel")}
+      className={`inline-flex items-center gap-1 rounded-full border border-ink-300 px-2.5 py-1.5 text-xs font-semibold text-ink-600 hover:border-brand-500 hover:text-brand-700 dark:border-ink-700 dark:text-ink-300 dark:hover:text-brand-400 ${className}`}
+    >
+      <span className={lang === "ru" ? "text-ink-950 dark:text-white" : "text-ink-400 dark:text-ink-600"}>RU</span>
+      <span className="text-ink-300 dark:text-ink-700">/</span>
+      <span className={lang === "en" ? "text-ink-950 dark:text-white" : "text-ink-400 dark:text-ink-600"}>EN</span>
+    </button>
+  );
+}
+
+const NAV: { to: string; key: string }[] = [
+  { to: "/store-builder", key: "nav.storeBuilder" },
+  { to: "/trends", key: "nav.trends" },
+  { to: "/tools/site-analyzer", key: "nav.siteAnalyzer" },
+  { to: "/tools/profit-calculator", key: "nav.calculator" },
+  { to: "/tools/ad-copy", key: "nav.adCopy" },
+  { to: "/saved", key: "nav.saved" },
 ];
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <header className="sticky top-0 z-40 border-b border-ink-200/70 bg-white/80 backdrop-blur-lg dark:border-ink-800 dark:bg-ink-950/80">
@@ -44,28 +63,32 @@ export function Header() {
                 }`
               }
             >
-              {item.label}
+              {t(item.key)}
             </NavLink>
           ))}
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
           <a href="/#pricing" className="rounded-lg px-3 py-2 text-sm font-medium text-ink-600 hover:text-ink-950 dark:text-ink-300 dark:hover:text-white">
-            Тарифы
+            {t("nav.pricing")}
           </a>
+          <LanguageToggle />
           <LinkButton href="/store-builder" className="!py-2.5">
-            Попробовать бесплатно
+            {t("nav.cta")}
           </LinkButton>
         </div>
 
-        <button
-          type="button"
-          className="lg:hidden rounded-lg p-2 text-ink-700 dark:text-ink-200"
-          onClick={() => setOpen((o) => !o)}
-          aria-label="Открыть меню"
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <LanguageToggle />
+          <button
+            type="button"
+            className="rounded-lg p-2 text-ink-700 dark:text-ink-200"
+            onClick={() => setOpen((o) => !o)}
+            aria-label={t("nav.openMenu")}
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </Container>
 
       {open && (
@@ -82,14 +105,14 @@ export function Header() {
                   }`
                 }
               >
-                {item.label}
+                {t(item.key)}
               </NavLink>
             ))}
             <a href="/#pricing" className="rounded-lg px-3 py-2.5 text-sm font-medium text-ink-700 dark:text-ink-200" onClick={() => setOpen(false)}>
-              Тарифы
+              {t("nav.pricing")}
             </a>
             <LinkButton href="/store-builder" className="mt-2 w-full">
-              Попробовать бесплатно
+              {t("nav.cta")}
             </LinkButton>
           </Container>
         </div>

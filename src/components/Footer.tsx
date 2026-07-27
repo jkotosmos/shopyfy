@@ -1,7 +1,50 @@
 import { Link } from "react-router-dom";
 import { Container } from "./ui";
+import { useLanguage, type Lang } from "../lib/i18n";
+
+const FOOTER_LINKS: Record<Lang, { create: { label: string; to: string }[]; research: { label: string; to: string }[]; company: { label: string; to: string }[] }> = {
+  ru: {
+    create: [
+      { label: "AI-конструктор магазина", to: "/store-builder" },
+      { label: "Тарифы", to: "/#pricing" },
+      { label: "Вопросы и ответы", to: "/#faq" },
+    ],
+    research: [
+      { label: "Поиск трендов", to: "/trends" },
+      { label: "SEO-анализ сайта", to: "/tools/site-analyzer" },
+      { label: "Калькулятор маржи", to: "/tools/profit-calculator" },
+      { label: "Генератор текстов для рекламы", to: "/tools/ad-copy" },
+      { label: "Сохранённые товары", to: "/saved" },
+    ],
+    company: [
+      { label: "О сервисе", to: "/#how-it-works" },
+      { label: "Контакты", to: "mailto:hello@shopyfy.app" },
+    ],
+  },
+  en: {
+    create: [
+      { label: "AI Store Builder", to: "/store-builder" },
+      { label: "Pricing", to: "/#pricing" },
+      { label: "FAQ", to: "/#faq" },
+    ],
+    research: [
+      { label: "Trend Research", to: "/trends" },
+      { label: "Site SEO Analyzer", to: "/tools/site-analyzer" },
+      { label: "Margin Calculator", to: "/tools/profit-calculator" },
+      { label: "Ad Copy Generator", to: "/tools/ad-copy" },
+      { label: "Saved Products", to: "/saved" },
+    ],
+    company: [
+      { label: "About", to: "/#how-it-works" },
+      { label: "Contact", to: "mailto:hello@shopyfy.app" },
+    ],
+  },
+};
 
 export function Footer() {
+  const { lang, t } = useLanguage();
+  const links = FOOTER_LINKS[lang];
+
   return (
     <footer className="border-t border-ink-200 dark:border-ink-800 bg-white dark:bg-ink-950">
       <Container className="py-12">
@@ -13,41 +56,17 @@ export function Footer() {
               </span>
               Shopyfy
             </Link>
-            <p className="mt-3 max-w-xs text-sm text-ink-500 dark:text-ink-400">
-              Вставьте ссылку на товар — получите готовый магазин на Shopify, а заодно поиск трендов, расчёт цены и тексты для рекламы, чтобы реально продавать.
-            </p>
+            <p className="mt-3 max-w-xs text-sm text-ink-500 dark:text-ink-400">{t("footer.tagline")}</p>
           </div>
 
-          <FooterCol
-            title="Создать"
-            links={[
-              { label: "AI-конструктор магазина", to: "/store-builder" },
-              { label: "Тарифы", to: "/#pricing" },
-              { label: "Вопросы и ответы", to: "/#faq" },
-            ]}
-          />
-          <FooterCol
-            title="Исследование"
-            links={[
-              { label: "Поиск трендов", to: "/trends" },
-              { label: "SEO-анализ сайта", to: "/tools/site-analyzer" },
-              { label: "Калькулятор маржи", to: "/tools/profit-calculator" },
-              { label: "Генератор текстов для рекламы", to: "/tools/ad-copy" },
-              { label: "Сохранённые товары", to: "/saved" },
-            ]}
-          />
-          <FooterCol
-            title="Компания"
-            links={[
-              { label: "О сервисе", to: "/#how-it-works" },
-              { label: "Контакты", to: "mailto:hello@shopyfy.app" },
-            ]}
-          />
+          <FooterCol title={t("footer.create")} links={links.create} />
+          <FooterCol title={t("footer.research")} links={links.research} />
+          <FooterCol title={t("footer.company")} links={links.company} />
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-ink-200 pt-6 text-xs text-ink-400 dark:border-ink-800 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Shopyfy. Прототип для исследования товаров — баллы трендов иллюстративны, проверяйте по ссылкам на источники.</p>
-          <p>Не аффилирован с Shopify Inc.</p>
+          <p>© {new Date().getFullYear()} Shopyfy. {t("footer.copyright")}</p>
+          <p>{t("footer.disclaimer")}</p>
         </div>
       </Container>
     </footer>
