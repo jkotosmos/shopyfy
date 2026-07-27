@@ -15,39 +15,39 @@ export function Footer() {
               Shopyfy
             </Link>
             <p className="mt-3 max-w-xs text-sm text-ink-500 dark:text-ink-400">
-              Paste a product link, get a full Shopify store — plus the trend research, pricing math, and ad angles to actually sell it.
+              Вставьте ссылку на товар — получите готовый магазин на Shopify, а заодно поиск трендов, расчёт цены и тексты для рекламы, чтобы реально продавать.
             </p>
           </div>
 
           <FooterCol
-            title="Build"
+            title="Создать"
             links={[
-              { label: "AI Store Builder", to: "/store-builder" },
-              { label: "Pricing", to: "/#pricing" },
-              { label: "FAQ", to: "/#faq" },
+              { label: "AI-конструктор магазина", to: "/store-builder" },
+              { label: "Тарифы", to: "/#pricing" },
+              { label: "Вопросы и ответы", to: "/#faq" },
             ]}
           />
           <FooterCol
-            title="Research"
+            title="Исследование"
             links={[
-              { label: "Trend Research", to: "/trends" },
-              { label: "Profit Calculator", to: "/tools/profit-calculator" },
-              { label: "Ad Copy Generator", to: "/tools/ad-copy" },
-              { label: "Saved Products", to: "/saved" },
+              { label: "Поиск трендов", to: "/trends" },
+              { label: "Калькулятор маржи", to: "/tools/profit-calculator" },
+              { label: "Генератор текстов для рекламы", to: "/tools/ad-copy" },
+              { label: "Сохранённые товары", to: "/saved" },
             ]}
           />
           <FooterCol
-            title="Company"
+            title="Компания"
             links={[
-              { label: "About", to: "/#how-it-works" },
-              { label: "Contact", to: "mailto:hello@shopyfy.app" },
+              { label: "О сервисе", to: "/#how-it-works" },
+              { label: "Контакты", to: "mailto:hello@shopyfy.app" },
             ]}
           />
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-ink-200 pt-6 text-xs text-ink-400 dark:border-ink-800 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Shopyfy. Product-research prototype — trend scores are illustrative; verify via the linked sources.</p>
-          <p>Not affiliated with Shopify Inc.</p>
+          <p>© {new Date().getFullYear()} Shopyfy. Прототип для исследования товаров — баллы трендов иллюстративны, проверяйте по ссылкам на источники.</p>
+          <p>Не аффилирован с Shopify Inc.</p>
         </div>
       </Container>
     </footer>

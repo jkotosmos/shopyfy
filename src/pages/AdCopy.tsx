@@ -20,13 +20,13 @@ function CopyButton({ text }: { text: string }) {
       }}
       className="flex items-center gap-1.5 rounded-lg border border-ink-200 px-2.5 py-1.5 text-xs font-medium text-ink-600 hover:border-brand-400 hover:text-brand-600 dark:border-ink-700 dark:text-ink-300"
     >
-      {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? "Copied" : "Copy"}
+      {copied ? <Check size={13} /> : <Copy size={13} />} {copied ? "Скопировано" : "Копировать"}
     </button>
   );
 }
 
 export function AdCopy() {
-  const [productName, setProductName] = useState("Portable Neck Fan");
+  const [productName, setProductName] = useState("Портативный вентилятор на шею");
   const [nicheId, setNicheId] = useState(NICHES[0].id);
   const niche = NICHES.find((n) => n.id === nicheId) ?? NICHES[0];
   const [benefit, setBenefit] = useState(niche.benefit);
@@ -35,17 +35,17 @@ export function AdCopy() {
 
   function handleGenerate(e: React.FormEvent) {
     e.preventDefault();
-    setAngles(generateAdAngles(productName || "this product", benefit || niche.benefit));
-    setHashtags(generateHashtags(productName || "product", niche.label));
+    setAngles(generateAdAngles(productName || "этот товар", benefit || niche.benefit));
+    setHashtags(generateHashtags(productName || "товар", niche.label));
   }
 
   return (
     <div className="py-14">
       <Container className="max-w-2xl text-center">
-        <Eyebrow>Ad copy tool</Eyebrow>
-        <SectionTitle>Social ad copy & hook generator</SectionTitle>
+        <Eyebrow>Инструмент для рекламы</Eyebrow>
+        <SectionTitle>Генератор рекламных текстов и хуков</SectionTitle>
         <p className="mt-3 text-ink-500 dark:text-ink-400">
-          Five proven ad angles for TikTok and Instagram — hook, body, and CTA — plus a starter hashtag set for your niche.
+          Пять проверенных рекламных ракурсов для TikTok и Instagram — хук, текст и призыв к действию — плюс стартовый набор хэштегов под вашу нишу.
         </p>
       </Container>
 
@@ -53,7 +53,7 @@ export function AdCopy() {
         <Card>
           <form onSubmit={handleGenerate} className="grid gap-4 sm:grid-cols-3">
             <label className="block sm:col-span-1">
-              <span className="text-sm font-medium text-ink-700 dark:text-ink-300">Product name</span>
+              <span className="text-sm font-medium text-ink-700 dark:text-ink-300">Название товара</span>
               <input
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
@@ -61,7 +61,7 @@ export function AdCopy() {
               />
             </label>
             <label className="block sm:col-span-1">
-              <span className="text-sm font-medium text-ink-700 dark:text-ink-300">Niche</span>
+              <span className="text-sm font-medium text-ink-700 dark:text-ink-300">Ниша</span>
               <select
                 value={nicheId}
                 onChange={(e) => {
@@ -75,7 +75,7 @@ export function AdCopy() {
               </select>
             </label>
             <label className="block sm:col-span-1">
-              <span className="text-sm font-medium text-ink-700 dark:text-ink-300">Core benefit</span>
+              <span className="text-sm font-medium text-ink-700 dark:text-ink-300">Ключевая польза</span>
               <input
                 value={benefit}
                 onChange={(e) => setBenefit(e.target.value)}
@@ -84,7 +84,7 @@ export function AdCopy() {
             </label>
             <div className="sm:col-span-3">
               <Button type="submit" className="w-full sm:w-auto">
-                <MessageSquareText size={16} /> Generate ad angles
+                <MessageSquareText size={16} /> Сгенерировать ракурсы
               </Button>
             </div>
           </form>
@@ -93,7 +93,7 @@ export function AdCopy() {
         {angles && (
           <div className="mt-8 animate-fade-up">
             <div className="mb-5 flex items-center justify-between">
-              <h3 className="flex items-center gap-2 font-semibold text-ink-950 dark:text-white"><Hash size={16} /> Suggested hashtags</h3>
+              <h3 className="flex items-center gap-2 font-semibold text-ink-950 dark:text-white"><Hash size={16} /> Рекомендованные хэштеги</h3>
               <CopyButton text={hashtags.join(" ")} />
             </div>
             <div className="mb-8 flex flex-wrap gap-2">

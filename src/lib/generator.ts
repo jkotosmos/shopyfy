@@ -1,7 +1,7 @@
 import { makeRng, pick, pickMany, randInt } from "./seed";
 import { detectNiche, type Niche } from "./niches";
 
-export type SourceMarketplace = "AliExpress" | "Amazon" | "Alibaba" | "Shopify" | "Custom link" | "Product name";
+export type SourceMarketplace = "AliExpress" | "Amazon" | "Alibaba" | "Shopify" | "по ссылке" | "по названию товара";
 
 export interface GeneratedStore {
   input: string;
@@ -55,8 +55,8 @@ function detectSource(url: URL | null, raw: string): SourceMarketplace {
   if (host.includes("amazon")) return "Amazon";
   if (host.includes("alibaba")) return "Alibaba";
   if (host.includes("myshopify") || host.includes("shopify")) return "Shopify";
-  if (url) return "Custom link";
-  return raw.trim() ? "Product name" : "Product name";
+  if (url) return "по ссылке";
+  return raw.trim() ? "по названию товара" : "по названию товара";
 }
 
 function extractProductWords(url: URL): string[] {
@@ -84,10 +84,10 @@ function extractProductWords(url: URL): string[] {
 }
 
 const FALLBACK_PRODUCTS = [
-  "Portable Neck Fan", "Magnetic Cable Organizer", "LED Galaxy Projector",
-  "Posture Corrector Brace", "Silicone Kitchen Gadget Set", "Mini Facial Massager",
-  "Foldable Phone Stand", "Pet Grooming Glove", "Resistance Band Set",
-  "Car Windshield Sunshade", "Collapsible Water Bottle", "Smart Sleep Mask",
+  "Портативный вентилятор на шею", "Магнитный органайзер для кабелей", "LED-проектор галактики",
+  "Корректор осанки", "Силиконовый набор кухонных гаджетов", "Мини-массажёр для лица",
+  "Складная подставка для телефона", "Перчатка для вычёсывания шерсти", "Набор резинок для фитнеса",
+  "Автомобильная шторка от солнца", "Складная бутылка для воды", "Умная маска для сна",
 ];
 
 function resolveProductName(input: string): { name: string; url: URL | null } {
@@ -124,57 +124,57 @@ const STORE_NAME_TEMPLATES = [
 ];
 
 const TAGLINES = [
-  "Small upgrade, big difference.",
-  "The one everyone asks about.",
-  "Made for people who notice details.",
-  "Everyday essentials, elevated.",
-  "Because good design shouldn't be rare.",
-  "Your new favorite, delivered.",
-  "Simple. Useful. Actually works.",
-  "Built around how you actually live.",
+  "Небольшое улучшение — большая разница.",
+  "Та самая вещь, о которой все спрашивают.",
+  "Для тех, кто замечает детали.",
+  "Повседневные вещи на новом уровне.",
+  "Потому что хороший дизайн не должен быть редкостью.",
+  "Ваш новый фаворит уже в пути.",
+  "Просто. Полезно. Реально работает.",
+  "Создано под то, как вы живёте на самом деле.",
 ];
 
 const USP_TEMPLATES = [
-  (p: string) => `Premium-grade materials make ${p} noticeably more durable than typical alternatives`,
-  (p: string) => `Free worldwide shipping and 30-day returns on every ${p} order`,
-  (_p: string) => `Backed by 4.7★ average rating across early customer reviews`,
-  (_p: string) => `Ships in discreet, eco-friendly packaging within 24 hours`,
-  (_p: string) => `Designed for effortless daily use — no learning curve`,
-  (_p: string) => `Limited first batch — restocks typically sell out within 2 weeks`,
-  (_p: string) => `Compact enough to travel with, sturdy enough for daily use`,
-  (_p: string) => `1-year warranty and real human customer support`,
+  (p: string) => `Материалы премиум-класса делают ${p} заметно долговечнее типичных аналогов`,
+  (p: string) => `Бесплатная доставка по всему миру и возврат в течение 30 дней на каждый заказ ${p}`,
+  (_p: string) => `Средний рейтинг 4.7★ по первым отзывам покупателей`,
+  (_p: string) => `Отправляется в неприметной эко-упаковке в течение 24 часов`,
+  (_p: string) => `Продуман для ежедневного использования без привыкания`,
+  (_p: string) => `Ограниченная первая партия — обычно раскупается за 2 недели`,
+  (_p: string) => `Компактный для путешествий и достаточно прочный для ежедневного использования`,
+  (_p: string) => `Год гарантии и реальная поддержка живых людей`,
 ];
 
 const SECTION_POOL = [
-  "Hero banner with product video",
-  "Problem → solution story block",
-  "Feature highlight grid",
-  "Before/after comparison slider",
-  "Customer review carousel",
-  "Instagram/TikTok UGC gallery",
-  "Size/spec comparison table",
-  "FAQ accordion",
-  "Trust badges + guarantee bar",
-  "Sticky add-to-cart bar",
-  "Countdown restock banner",
-  "Bundle & save block",
+  "Hero-баннер с видео товара",
+  "Блок «проблема → решение»",
+  "Сетка ключевых преимуществ",
+  "Слайдер «до / после»",
+  "Карусель отзывов покупателей",
+  "Галерея UGC-контента из Instagram/TikTok",
+  "Таблица сравнения размеров/характеристик",
+  "Блок часто задаваемых вопросов",
+  "Плашки доверия и гарантии",
+  "Липкая панель «добавить в корзину»",
+  "Баннер обратного отсчёта до допродажи",
+  "Блок «комплект и экономия»",
 ];
 
 const COLLECTION_POOL = [
-  "Best Sellers", "New Arrivals", "Under $30", "Staff Picks",
-  "Trending This Week", "Gift Ideas", "Bundle Deals", "Back in Stock",
+  "Хиты продаж", "Новинки", "До $30", "Выбор редакции",
+  "В тренде на этой неделе", "Идеи подарков", "Комплекты со скидкой", "Снова в наличии",
 ];
 
 const BUILD_STEPS = [
-  "Reading product link…",
-  "Cross-checking 1,200+ similar listings…",
-  "Analyzing market demand & competition…",
-  "Drafting brand name and identity…",
-  "Writing product page copy…",
-  "Generating page sections & layout…",
-  "Building bundle and cart upsell offers…",
-  "Optimizing for mobile conversion…",
-  "Store ready ✅",
+  "Читаем ссылку на товар…",
+  "Сверяем с 1200+ похожими товарами…",
+  "Анализируем спрос и конкуренцию…",
+  "Придумываем название и стиль бренда…",
+  "Пишем тексты для страницы товара…",
+  "Генерируем секции и структуру страницы…",
+  "Собираем комплект-предложения и допродажи в корзине…",
+  "Оптимизируем под мобильную конверсию…",
+  "Магазин готов ✅",
 ];
 
 export function generateStore(rawInput: string): GeneratedStore {
@@ -189,22 +189,22 @@ export function generateStore(rawInput: string): GeneratedStore {
 
   const tagline = pick(rng, TAGLINES);
   const heroHeadline = `${productName}: ${tagline.replace(/\.$/, "")}`;
-  const heroSub = `Discover why shoppers are switching to the ${productName.toLowerCase()} for ${niche.benefit}.`;
+  const heroSub = `Узнайте, почему покупатели выбирают ${productName.toLowerCase()}. Вот что это даёт: ${niche.benefit}.`;
 
-  const description = `The ${productName} was picked because it solves a real, recurring problem tied to ${niche.benefit}. Our AI analyzed pricing, reviews and ad activity across the category before generating a page structured to answer buyer objections in order: what it is, why it's different, proof it works, and a low-friction way to try it.`;
+  const description = `${productName} был выбран потому, что решает реальную, регулярно возникающую проблему, связанную с идеей «${niche.benefit}». Наш ИИ проанализировал цены, отзывы и рекламную активность в категории перед тем, как сгенерировать страницу, отвечающую на возражения покупателя по порядку: что это, чем отличается, доказательства эффективности и простой способ попробовать.`;
 
   const usps = pickMany(rng, USP_TEMPLATES, 3).map((fn) => fn(productName));
-  const collections = ["Best Sellers", ...pickMany(rng, COLLECTION_POOL.slice(1), 3)];
+  const collections = ["Хиты продаж", ...pickMany(rng, COLLECTION_POOL.slice(1), 3)];
   const pageSections = pickMany(rng, SECTION_POOL, 6);
 
   const bundleDiscountPct = randInt(rng, 10, 20);
   const bundleUpsell = {
-    title: `Buy 2, Save ${bundleDiscountPct}%`,
-    discount: `Bundle of 3 → Save ${bundleDiscountPct + 8}%`,
+    title: `Купи 2, экономь ${bundleDiscountPct}%`,
+    discount: `Комплект из 3 → экономия ${bundleDiscountPct + 8}%`,
   };
   const cartUpsell = {
-    title: `Complete the set`,
-    addOn: `Add a travel case`,
+    title: `Дополните комплект`,
+    addOn: `Добавить дорожный чехол`,
     price: `+$${randInt(rng, 6, 14)}.99`,
   };
 
@@ -215,7 +215,7 @@ export function generateStore(rawInput: string): GeneratedStore {
   const marginPct = Math.round(((price - cost) / price) * 100);
 
   const marketScore = randInt(rng, 58, 96);
-  const competitionLabel = marketScore > 85 ? "High demand, moderate competition" : marketScore > 70 ? "Solid demand, low-moderate competition" : "Niche demand, low competition";
+  const competitionLabel = marketScore > 85 ? "Высокий спрос, умеренная конкуренция" : marketScore > 70 ? "Стабильный спрос, конкуренция ниже средней" : "Нишевый спрос, низкая конкуренция";
 
   return {
     input: rawInput,

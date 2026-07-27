@@ -52,13 +52,13 @@ export function Trends() {
   const [params] = useSearchParams();
   const [query, setQuery] = useState(params.get("q") ?? "");
   const [searched, setSearched] = useState(params.get("q") ?? "");
-  const [category, setCategory] = useState<string>("All");
+  const [category, setCategory] = useState<string>("Все");
   const [openId, setOpenId] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
-  const categories = useMemo(() => ["All", ...Array.from(new Set(TRENDING_NICHES.map((n) => n.category)))], []);
+  const categories = useMemo(() => ["Все", ...Array.from(new Set(TRENDING_NICHES.map((n) => n.category)))], []);
   const filtered = useMemo(
-    () => TRENDING_NICHES.filter((n) => category === "All" || n.category === category),
+    () => TRENDING_NICHES.filter((n) => category === "Все" || n.category === category),
     [category],
   );
   const searchLinks = useMemo(() => (searched.trim() ? buildResearchLinks(searched) : []), [searched]);
@@ -69,19 +69,19 @@ export function Trends() {
   }
 
   function handleSaveNiche(n: (typeof TRENDING_NICHES)[number]) {
-    addSaved({ name: n.name, category: n.category, note: `Trend score ${n.score}/100 · ${n.growth} · signal: ${n.signal}` });
+    addSaved({ name: n.name, category: n.category, note: `Балл тренда ${n.score}/100 · ${n.growth} · сигнал: ${n.signal}` });
     setSavedIds((prev) => new Set(prev).add(n.id));
   }
 
   return (
     <div className="py-14">
       <Container className="max-w-3xl text-center">
-        <Eyebrow>Trend research</Eyebrow>
-        <SectionTitle>Find what's popular — and see exactly where that came from</SectionTitle>
+        <Eyebrow>Поиск трендов</Eyebrow>
+        <SectionTitle>Найдите, что популярно — и точно узнайте, откуда это известно</SectionTitle>
         <p className="mt-3 text-ink-500 dark:text-ink-400">
-          Search any product or niche to get one-click research links into the actual social/trend sources — Google
-          Trends, TikTok, Meta Ad Library, Pinterest, YouTube, Reddit — plus supplier and retail listings. No black-box
-          scores: every claim is one click from its source.
+          Ищите любой товар или нишу, чтобы получить ссылки на реальные источники трендов в один клик — Google
+          Trends, TikTok, Meta Ad Library, Pinterest, YouTube, Reddit — плюс карточки поставщиков и розницы. Никаких
+          баллов из чёрного ящика: каждое утверждение — в один клик от источника.
         </p>
 
         <form onSubmit={handleSearch} className="mx-auto mt-8 flex max-w-xl flex-col gap-2 sm:flex-row">
@@ -90,12 +90,12 @@ export function Trends() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="e.g. 'posture corrector' or 'led lamp'…"
+              placeholder="например, «корректор осанки» или «led лампа»…"
               className="w-full rounded-xl border border-ink-200 bg-white py-3.5 pl-10 pr-4 text-sm text-ink-900 shadow-sm outline-none placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/30 dark:border-ink-700 dark:bg-ink-900 dark:text-white"
             />
           </div>
           <button type="submit" className="rounded-xl bg-brand-500 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-500/25 hover:bg-brand-600 whitespace-nowrap">
-            Get research links
+            Получить ссылки
           </button>
         </form>
       </Container>
@@ -103,8 +103,8 @@ export function Trends() {
       {searched.trim() && (
         <Container className="mt-10 max-w-3xl">
           <Card>
-            <h3 className="font-semibold text-ink-950 dark:text-white">Research links for "{searched.trim()}"</h3>
-            <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">Opens the real search/trend page for this exact keyword on each platform.</p>
+            <h3 className="font-semibold text-ink-950 dark:text-white">Ссылки на источники по запросу «{searched.trim()}»</h3>
+            <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">Открывает реальную страницу поиска/трендов по этому ключевому слову на каждой платформе.</p>
             <div className="mt-4">
               <LinkGrid links={searchLinks} />
             </div>
@@ -114,11 +114,11 @@ export function Trends() {
 
       <Container className="mt-16">
         <div className="mx-auto max-w-2xl text-center">
-          <Eyebrow>Starter list</Eyebrow>
-          <SectionTitle>Trending niches to get you started</SectionTitle>
+          <Eyebrow>Стартовый список</Eyebrow>
+          <SectionTitle>Трендовые ниши для старта</SectionTitle>
           <p className="mt-3 text-sm text-ink-500 dark:text-ink-400">
-            Scores and growth figures below are illustrative starting points, not a live feed — expand any card to
-            jump straight to the live sources and verify current numbers yourself.
+            Баллы и цифры роста ниже — это иллюстративная отправная точка, а не данные в реальном времени: раскройте
+            любую карточку, чтобы перейти к живым источникам и проверить актуальные цифры самостоятельно.
           </p>
         </div>
 
@@ -151,7 +151,7 @@ export function Trends() {
                 <h3 className="mt-3 font-semibold text-ink-950 dark:text-white">{n.name}</h3>
                 <p className="text-xs font-medium text-brand-600 dark:text-brand-400">{n.growth}</p>
                 <p className="mt-2 flex-1 text-sm text-ink-500 dark:text-ink-400">{n.blurb}</p>
-                <p className="mt-2 text-xs italic text-ink-400">Signal: {n.signal}</p>
+                <p className="mt-2 text-xs italic text-ink-400">Сигнал: {n.signal}</p>
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {n.platforms.map((p) => (
                     <span key={p} className="rounded-full bg-ink-100 px-2.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">{p}</span>
@@ -164,13 +164,13 @@ export function Trends() {
                     onClick={() => setOpenId(open ? null : n.id)}
                     className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-ink-200 py-2 text-xs font-semibold text-ink-700 hover:border-brand-400 dark:border-ink-700 dark:text-ink-200"
                   >
-                    {open ? "Hide sources" : "See sources"} {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                    {open ? "Скрыть источники" : "Показать источники"} {open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSaveNiche(n)}
                     className="flex items-center justify-center rounded-lg border border-ink-200 px-3 text-ink-700 hover:border-brand-400 dark:border-ink-700 dark:text-ink-200"
-                    aria-label="Save to watchlist"
+                    aria-label="Сохранить в вотчлист"
                   >
                     <Bookmark size={14} className={savedIds.has(n.id) ? "fill-brand-500 text-brand-500" : ""} />
                   </button>

@@ -87,7 +87,7 @@ export function Modal({ open, onClose, title, children }: { open: boolean; onClo
       <div className="relative w-full max-w-md rounded-2xl border border-ink-200 bg-white p-6 shadow-2xl dark:border-ink-800 dark:bg-ink-900">
         <div className="flex items-start justify-between">
           <h3 className="font-semibold text-ink-950 dark:text-white">{title}</h3>
-          <button type="button" onClick={onClose} className="rounded-lg p-1 text-ink-400 hover:bg-ink-100 dark:hover:bg-ink-800" aria-label="Close">
+          <button type="button" onClick={onClose} className="rounded-lg p-1 text-ink-400 hover:bg-ink-100 dark:hover:bg-ink-800" aria-label="Закрыть">
             <X size={18} />
           </button>
         </div>

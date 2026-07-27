@@ -4,11 +4,11 @@ import { Menu, X, Sparkles } from "lucide-react";
 import { Container, LinkButton } from "./ui";
 
 const NAV = [
-  { to: "/store-builder", label: "Store Builder" },
-  { to: "/trends", label: "Trend Research" },
-  { to: "/tools/profit-calculator", label: "Profit Calculator" },
-  { to: "/tools/ad-copy", label: "Ad Copy" },
-  { to: "/saved", label: "Saved" },
+  { to: "/store-builder", label: "Конструктор магазина" },
+  { to: "/trends", label: "Поиск трендов" },
+  { to: "/tools/profit-calculator", label: "Калькулятор маржи" },
+  { to: "/tools/ad-copy", label: "Тексты для рекламы" },
+  { to: "/saved", label: "Сохранённое" },
 ];
 
 export function Header() {
@@ -44,10 +44,10 @@ export function Header() {
 
         <div className="hidden lg:flex items-center gap-2">
           <a href="/#pricing" className="rounded-lg px-3 py-2 text-sm font-medium text-ink-600 hover:text-ink-950 dark:text-ink-300 dark:hover:text-white">
-            Pricing
+            Тарифы
           </a>
           <LinkButton href="/store-builder" className="!py-2.5">
-            Try it free
+            Попробовать бесплатно
           </LinkButton>
         </div>
 
@@ -55,7 +55,7 @@ export function Header() {
           type="button"
           className="lg:hidden rounded-lg p-2 text-ink-700 dark:text-ink-200"
           onClick={() => setOpen((o) => !o)}
-          aria-label="Toggle menu"
+          aria-label="Открыть меню"
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
@@ -79,10 +79,10 @@ export function Header() {
               </NavLink>
             ))}
             <a href="/#pricing" className="rounded-lg px-3 py-2.5 text-sm font-medium text-ink-700 dark:text-ink-200" onClick={() => setOpen(false)}>
-              Pricing
+              Тарифы
             </a>
             <LinkButton href="/store-builder" className="mt-2 w-full">
-              Try it free
+              Попробовать бесплатно
             </LinkButton>
           </Container>
         </div>

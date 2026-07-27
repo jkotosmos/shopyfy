@@ -29,22 +29,22 @@ export function Saved() {
   return (
     <div className="py-14">
       <Container className="max-w-2xl text-center">
-        <Eyebrow>Watchlist</Eyebrow>
-        <SectionTitle>Saved products</SectionTitle>
+        <Eyebrow>Вотчлист</Eyebrow>
+        <SectionTitle>Сохранённые товары</SectionTitle>
         <p className="mt-3 text-ink-500 dark:text-ink-400">
-          Products you bookmark from the Store Builder or Trend Research tools land here — stored only in this
-          browser, no account required.
+          Товары, которые вы сохраняете из конструктора магазина или поиска трендов, попадают сюда — хранятся
+          только в этом браузере, аккаунт не нужен.
         </p>
       </Container>
 
       <Container className="mt-10 max-w-3xl">
         <Card>
-          <h3 className="flex items-center gap-2 font-semibold text-ink-950 dark:text-white"><Plus size={16} /> Add manually</h3>
+          <h3 className="flex items-center gap-2 font-semibold text-ink-950 dark:text-white"><Plus size={16} /> Добавить вручную</h3>
           <form onSubmit={handleAdd} className="mt-4 grid gap-3 sm:grid-cols-4">
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Product name"
+              placeholder="Название товара"
               className="rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white sm:col-span-2"
             />
             <select
@@ -54,11 +54,11 @@ export function Saved() {
             >
               {NICHES.map((n) => <option key={n.id} value={n.label}>{n.emoji} {n.label}</option>)}
             </select>
-            <Button type="submit">Add</Button>
+            <Button type="submit">Добавить</Button>
             <input
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Note (optional)"
+              placeholder="Заметка (необязательно)"
               className="rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white sm:col-span-4"
             />
           </form>
@@ -68,7 +68,7 @@ export function Saved() {
           {items.length === 0 && (
             <div className="rounded-2xl border border-dashed border-ink-300 py-14 text-center text-ink-400 dark:border-ink-700">
               <Bookmark className="mx-auto mb-2" size={26} />
-              Nothing saved yet. Bookmark a product from the Store Builder or Trend Research pages.
+              Пока ничего не сохранено. Добавьте товар из конструктора магазина или страницы поиска трендов.
             </div>
           )}
           {items.map((item) => (
@@ -79,13 +79,13 @@ export function Saved() {
                   <span className="rounded-full bg-ink-100 px-2.5 py-0.5 text-xs font-medium text-ink-600 dark:bg-ink-800 dark:text-ink-300">{item.category}</span>
                 </div>
                 {item.note && <p className="mt-1.5 text-sm text-ink-500 dark:text-ink-400">{item.note}</p>}
-                <p className="mt-1.5 text-xs text-ink-400">Saved {new Date(item.savedAt).toLocaleDateString()}</p>
+                <p className="mt-1.5 text-xs text-ink-400">Сохранено {new Date(item.savedAt).toLocaleDateString("ru-RU")}</p>
               </div>
               <button
                 type="button"
                 onClick={() => handleRemove(item.id)}
                 className="shrink-0 rounded-lg p-2 text-ink-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/30"
-                aria-label="Remove"
+                aria-label="Удалить"
               >
                 <Trash2 size={16} />
               </button>

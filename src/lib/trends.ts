@@ -1,9 +1,9 @@
-// Trending-product research: a curated starter list of niches plus a
-// universal keyword -> research-link builder. The links are real, generic
-// deep-links into public trend/discovery tools (Google Trends, TikTok, Meta
-// Ad Library, Pinterest, YouTube, Reddit, AliExpress, Amazon) so every claim
-// about "what's popular" can be traced back to its actual source instead of
-// being taken on faith.
+// Поиск трендовых товаров: стартовый список ниш плюс универсальный
+// построитель ссылок «ключевое слово -> инструменты исследования тренда».
+// Ссылки настоящие и ведут в открытые инструменты (Google Trends, TikTok,
+// Meta Ad Library, Pinterest, YouTube, Reddit, AliExpress, Amazon), поэтому
+// любое утверждение о «популярности» можно проверить у первоисточника,
+// а не принимать на веру.
 
 export interface ResearchLink {
   label: string;
@@ -20,49 +20,49 @@ export function buildResearchLinks(keyword: string): ResearchLink[] {
       label: "Google Trends",
       platform: "Google Trends",
       url: `https://trends.google.com/trends/explore?date=today%203-m&q=${enc}`,
-      hint: "Search interest over time & by region",
+      hint: "Интерес к поиску во времени и по регионам",
     },
     {
-      label: "TikTok search",
+      label: "Поиск в TikTok",
       platform: "TikTok",
       url: `https://www.tiktok.com/search?q=${enc}`,
-      hint: "Videos & hashtag momentum",
+      hint: "Видео и динамика хэштега",
     },
     {
       label: "Meta Ad Library",
       platform: "Facebook/Instagram Ads",
       url: `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&q=${enc}&search_type=keyword_unordered`,
-      hint: "Who is actively running ads for this right now",
+      hint: "Кто прямо сейчас крутит рекламу по этой теме",
     },
     {
-      label: "Pinterest search",
+      label: "Поиск в Pinterest",
       platform: "Pinterest",
       url: `https://www.pinterest.com/search/pins/?q=${enc}`,
-      hint: "Visual demand & seasonal boards",
+      hint: "Визуальный спрос и сезонные подборки",
     },
     {
-      label: "YouTube search",
+      label: "Поиск на YouTube",
       platform: "YouTube",
       url: `https://www.youtube.com/results?search_query=${enc}+review`,
-      hint: "Reviews & unboxings — social proof signal",
+      hint: "Обзоры и распаковки — сигнал социального доказательства",
     },
     {
-      label: "Reddit search",
+      label: "Поиск на Reddit",
       platform: "Reddit",
       url: `https://www.reddit.com/search/?q=${enc}`,
-      hint: "Unfiltered opinions & complaints (great for USPs)",
+      hint: "Непричёсанные мнения и жалобы (отлично для УТП)",
     },
     {
-      label: "AliExpress listings",
+      label: "Товары на AliExpress",
       platform: "AliExpress",
       url: `https://www.aliexpress.com/wholesale?SearchText=${enc}`,
-      hint: "Supplier price range & order volume",
+      hint: "Диапазон цен поставщика и объём заказов",
     },
     {
-      label: "Amazon listings",
+      label: "Товары на Amazon",
       platform: "Amazon",
       url: `https://www.amazon.com/s?k=${enc}`,
-      hint: "Retail price ceiling & review count",
+      hint: "Потолок розничной цены и количество отзывов",
     },
   ];
 }
@@ -80,20 +80,21 @@ export interface TrendingNiche {
   blurb: string;
 }
 
-// Illustrative starter list to seed research — treat scores/growth as
-// directional, not live data. Click through to the source links per item
-// (or search your own keyword above) to verify current numbers yourself.
+// Стартовый список для затравки исследования — воспринимайте баллы/рост как
+// ориентир, а не как данные в реальном времени. Переходите по ссылкам-источникам
+// в каждой карточке (или ищите своё ключевое слово выше), чтобы проверить
+// актуальные цифры самостоятельно.
 export const TRENDING_NICHES: TrendingNiche[] = [
-  { id: "neck-fan", name: "Portable Neck Fan", keyword: "portable neck fan", category: "Electronics", emoji: "🌀", score: 91, growth: "+164% search interest (90d)", signal: "Viral TikTok #tiktokmademebuyit sound trend", platforms: ["TikTok", "Google Trends"], blurb: "Recurring summer breakout item; look for bladeless variants to reduce return rate." },
-  { id: "led-projector", name: "Galaxy LED Projector", keyword: "galaxy led projector", category: "Home Decor", emoji: "🌌", score: 87, growth: "+92% search interest (90d)", signal: "Recurring 'room aesthetic' trend on TikTok/Pinterest", platforms: ["Pinterest", "TikTok"], blurb: "Strong repeat seasonality around back-to-school and winter room-makeover trends." },
-  { id: "posture-corrector", name: "Posture Corrector Brace", keyword: "posture corrector brace", category: "Wellness", emoji: "🧍", score: 78, growth: "+41% search interest (90d)", signal: "Steady demand, high AOV upsell potential (bundle with heat pads)", platforms: ["Google Trends", "Amazon"], blurb: "Evergreen problem-aware niche — good for Meta ads using before/after angle." },
-  { id: "mini-massager", name: "Mini Facial Massager", keyword: "mini facial massager", category: "Beauty", emoji: "💆", score: 84, growth: "+118% search interest (90d)", signal: "Skincare-tool wave riding on 'get ready with me' content", platforms: ["TikTok", "Pinterest"], blurb: "Pairs well with a skincare routine bundle upsell." },
-  { id: "cable-organizer", name: "Magnetic Cable Organizer", keyword: "magnetic cable organizer", category: "Electronics", emoji: "🧲", score: 69, growth: "+22% search interest (90d)", signal: "Low competition, consistent desk-setup content demand", platforms: ["YouTube", "Reddit"], blurb: "Great low-cost, high-margin add-on/cart-upsell item rather than hero product." },
-  { id: "pet-grooming-glove", name: "Pet Grooming Glove", keyword: "pet grooming glove", category: "Pet", emoji: "🐶", score: 74, growth: "+37% search interest (90d)", signal: "Steady pet-content demand across TikTok & Instagram Reels", platforms: ["TikTok", "Instagram"], blurb: "Great for UGC ads — pet reactions perform well organically." },
-  { id: "resistance-bands", name: "Resistance Band Set", keyword: "resistance band set", category: "Fitness", emoji: "🏋️", score: 72, growth: "+18% search interest (90d)", signal: "Evergreen home-workout category, January & September spikes", platforms: ["Google Trends", "YouTube"], blurb: "Highly seasonal — plan ad spend around New Year and back-to-school windows." },
-  { id: "sunshade", name: "Car Windshield Sunshade", keyword: "car windshield sunshade", category: "Auto", emoji: "☀️", score: 65, growth: "+29% search interest (90d, seasonal)", signal: "Strong summer seasonality, regional demand spikes", platforms: ["Google Trends", "Amazon"], blurb: "Time launch 6-8 weeks before summer in target region." },
-  { id: "sleep-mask", name: "Smart Sleep Mask", keyword: "smart sleep mask", category: "Wellness", emoji: "😴", score: 80, growth: "+55% search interest (90d)", signal: "Growing 'sleep hygiene' content wave on TikTok/YouTube", platforms: ["TikTok", "YouTube"], blurb: "Bundle with blue-light glasses for a strong cart upsell." },
-  { id: "phone-stand", name: "Foldable Phone Stand", keyword: "foldable phone stand", category: "Electronics", emoji: "📱", score: 60, growth: "+11% search interest (90d)", signal: "Steady, low-hype utility demand", platforms: ["Amazon", "Reddit"], blurb: "Low margin alone — best as a free-plus-shipping lead magnet." },
-  { id: "kitchen-gadget", name: "Silicone Kitchen Gadget Set", keyword: "silicone kitchen gadget set", category: "Kitchen", emoji: "🍳", score: 76, growth: "+34% search interest (90d)", signal: "Recurring 'kitchen hacks' short-form video demand", platforms: ["TikTok", "Pinterest"], blurb: "Pairs naturally with a Bundle Upsell (set of 3-5 tools)." },
-  { id: "water-bottle", name: "Collapsible Water Bottle", keyword: "collapsible water bottle", category: "Outdoors", emoji: "💧", score: 63, growth: "+9% search interest (90d)", signal: "Stable travel/outdoors demand, low volatility", platforms: ["Google Trends", "Amazon"], blurb: "Good evergreen filler product for an outdoors-niche store." },
+  { id: "neck-fan", name: "Портативный вентилятор на шею", keyword: "portable neck fan", category: "Электроника", emoji: "🌀", score: 91, growth: "+164% интереса в поиске (90 дней)", signal: "Вирусный тренд в TikTok под звук #tiktokmademebuyit", platforms: ["TikTok", "Google Trends"], blurb: "Регулярный летний хит; ищите безлопастные варианты, чтобы снизить процент возвратов." },
+  { id: "led-projector", name: "LED-проектор «Галактика»", keyword: "galaxy led projector", category: "Декор для дома", emoji: "🌌", score: 87, growth: "+92% интереса в поиске (90 дней)", signal: "Повторяющийся тренд «эстетика комнаты» в TikTok/Pinterest", platforms: ["Pinterest", "TikTok"], blurb: "Сильная сезонность вокруг «назад в школу» и зимнего обновления комнаты." },
+  { id: "posture-corrector", name: "Корректор осанки", keyword: "posture corrector brace", category: "Здоровье", emoji: "🧍", score: 78, growth: "+41% интереса в поиске (90 дней)", signal: "Стабильный спрос, высокий потенциал допродаж (комплект с грелками)", platforms: ["Google Trends", "Amazon"], blurb: "Вечнозелёная ниша с осознанной проблемой — хорошо заходит в Meta через ракурс «до/после»." },
+  { id: "mini-massager", name: "Мини-массажёр для лица", keyword: "mini facial massager", category: "Красота", emoji: "💆", score: 84, growth: "+118% интереса в поиске (90 дней)", signal: "Волна бьюти-гаджетов на контенте формата «собираюсь с вами»", platforms: ["TikTok", "Pinterest"], blurb: "Хорошо сочетается с допродажей набора для ухода за кожей." },
+  { id: "cable-organizer", name: "Магнитный органайзер для кабелей", keyword: "magnetic cable organizer", category: "Электроника", emoji: "🧲", score: 69, growth: "+22% интереса в поиске (90 дней)", signal: "Низкая конкуренция, стабильный спрос в контенте про рабочее место", platforms: ["YouTube", "Reddit"], blurb: "Отличный недорогой товар с высокой маржой для допродажи, а не как хедлайнер магазина." },
+  { id: "pet-grooming-glove", name: "Перчатка для вычёсывания шерсти", keyword: "pet grooming glove", category: "Питомцы", emoji: "🐶", score: 74, growth: "+37% интереса в поиске (90 дней)", signal: "Стабильный спрос на контент про питомцев в TikTok и Reels", platforms: ["TikTok", "Instagram"], blurb: "Отлично подходит для UGC-рекламы — реакции животных хорошо заходят органически." },
+  { id: "resistance-bands", name: "Набор резинок для фитнеса", keyword: "resistance band set", category: "Фитнес", emoji: "🏋️", score: 72, growth: "+18% интереса в поиске (90 дней)", signal: "Вечнозелёная категория домашних тренировок, всплески в январе и сентябре", platforms: ["Google Trends", "YouTube"], blurb: "Сильно сезонный товар — планируйте рекламный бюджет под Новый год и «назад в школу»." },
+  { id: "sunshade", name: "Автомобильная шторка от солнца", keyword: "car windshield sunshade", category: "Авто", emoji: "☀️", score: 65, growth: "+29% интереса в поиске (90 дней, сезонно)", signal: "Сильная летняя сезонность, региональные всплески спроса", platforms: ["Google Trends", "Amazon"], blurb: "Запускайте за 6–8 недель до лета в целевом регионе." },
+  { id: "sleep-mask", name: "Умная маска для сна", keyword: "smart sleep mask", category: "Здоровье", emoji: "😴", score: 80, growth: "+55% интереса в поиске (90 дней)", signal: "Растущая волна контента про «гигиену сна» в TikTok/YouTube", platforms: ["TikTok", "YouTube"], blurb: "Комплект с очками, блокирующими синий свет, даёт сильную допродажу в корзине." },
+  { id: "phone-stand", name: "Складная подставка для телефона", keyword: "foldable phone stand", category: "Электроника", emoji: "📱", score: 60, growth: "+11% интереса в поиске (90 дней)", signal: "Стабильный утилитарный спрос без ажиотажа", platforms: ["Amazon", "Reddit"], blurb: "Низкая маржа сама по себе — лучше как товар-приманка «бесплатно + доставка»." },
+  { id: "kitchen-gadget", name: "Силиконовый набор кухонных гаджетов", keyword: "silicone kitchen gadget set", category: "Кухня", emoji: "🍳", score: 76, growth: "+34% интереса в поиске (90 дней)", signal: "Постоянный спрос на короткие видео «кухонные лайфхаки»", platforms: ["TikTok", "Pinterest"], blurb: "Естественно сочетается с допродажей комплекта (набор из 3–5 инструментов)." },
+  { id: "water-bottle", name: "Складная бутылка для воды", keyword: "collapsible water bottle", category: "Активный отдых", emoji: "💧", score: 63, growth: "+9% интереса в поиске (90 дней)", signal: "Стабильный спрос в теме путешествий/активного отдыха, низкая волатильность", platforms: ["Google Trends", "Amazon"], blurb: "Хороший вечнозелёный дополняющий товар для магазина в нише активного отдыха." },
 ];

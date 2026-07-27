@@ -58,19 +58,19 @@ export function computeWinningScore(inputs: ScoreInputs): ScoreResult {
 
   const total = growthPoints + competitionPoints + marginPoints + priceSweetSpot;
 
-  let verdict = "Risky — needs a stronger angle before you spend on ads.";
-  if (total >= 80) verdict = "Strong winning-product signal — worth testing with a small ad budget.";
-  else if (total >= 60) verdict = "Promising — validate demand with organic content before scaling ads.";
-  else if (total >= 40) verdict = "Mixed signals — improve margin or find a less saturated angle.";
+  let verdict = "Рискованно — нужен более сильный ракурс, прежде чем тратить на рекламу.";
+  if (total >= 80) verdict = "Сильный сигнал выигрышного товара — стоит протестировать на небольшом рекламном бюджете.";
+  else if (total >= 60) verdict = "Перспективно — сначала проверьте спрос органическим контентом, потом масштабируйте рекламу.";
+  else if (total >= 40) verdict = "Смешанные сигналы — улучшите маржу или найдите менее насыщенный ракурс.";
 
   return {
     total,
     verdict,
     breakdown: [
-      { label: "Trend growth", points: growthPoints, max: 35 },
-      { label: "Competition level", points: competitionPoints, max: 25 },
-      { label: "Profit margin", points: marginPoints, max: 30 },
-      { label: "Price sweet spot ($15–$60)", points: priceSweetSpot, max: 10 },
+      { label: "Рост тренда", points: growthPoints, max: 35 },
+      { label: "Уровень конкуренции", points: competitionPoints, max: 25 },
+      { label: "Маржа прибыли", points: marginPoints, max: 30 },
+      { label: "Оптимальная цена ($15–$60)", points: priceSweetSpot, max: 10 },
     ],
   };
 }
