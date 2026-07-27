@@ -170,7 +170,7 @@ export function SiteAnalyzer() {
                   <Badge>{report.niche.emoji} {report.overview.category}</Badge>
                   <span className="text-xs font-medium text-ink-400">Топ-гео: {report.overview.country}</span>
                 </div>
-                <h3 className="mt-2 flex items-center gap-2 text-2xl font-bold text-ink-950 dark:text-white">
+                <h3 className="mt-2 flex items-center gap-2 font-display text-2xl font-semibold text-ink-950 dark:text-white">
                   <Globe size={20} className="text-brand-500" /> {report.domain}
                 </h3>
               </div>

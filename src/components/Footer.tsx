@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Sparkles } from "lucide-react";
 import { Container } from "./ui";
 
 export function Footer() {
@@ -8,9 +7,9 @@ export function Footer() {
       <Container className="py-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <Link to="/" className="flex items-center gap-2 font-extrabold text-lg text-ink-950 dark:text-white">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-700 text-white">
-                <Sparkles size={16} />
+            <Link to="/" className="flex items-center gap-2.5 font-display text-lg font-semibold text-ink-950 dark:text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-700 font-display text-base font-semibold text-brand-50">
+                S
               </span>
               Shopyfy
             </Link>

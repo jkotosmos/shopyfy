@@ -66,8 +66,8 @@ export function Home() {
               <Sparkles size={13} /> AI-конструктор магазина для дропшипперов
             </Badge>
           </div>
-          <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-extrabold tracking-tight text-ink-950 dark:text-white sm:text-6xl animate-fade-up" style={{ animationDelay: "80ms" }}>
-            Превратите любую ссылку на товар в магазин, который <span className="text-brand-600 dark:text-brand-400">продаёт</span>
+          <h1 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight text-ink-950 dark:text-white sm:text-6xl animate-fade-up" style={{ animationDelay: "80ms" }}>
+            Превратите любую ссылку на товар в магазин, который <span className="italic text-brand-600 dark:text-brand-400">продаёт</span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg text-ink-600 dark:text-ink-300 animate-fade-up" style={{ animationDelay: "160ms" }}>
             Вставьте ссылку с AliExpress, Amazon, Alibaba или Shopify. ИИ Shopyfy соберёт главную страницу, страницы товаров, допродажи и тексты — а затем вы импортируете всё прямо в Shopify.
@@ -259,7 +259,7 @@ export function Home() {
       <section className="py-20">
         <Container>
           <div className="rounded-3xl bg-ink-950 px-8 py-14 text-center dark:bg-ink-900">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">Вставьте ссылку. Увидьте свой магазин за секунды.</h2>
+            <h2 className="font-display text-3xl font-semibold text-white sm:text-4xl">Вставьте ссылку. Увидьте свой магазин за секунды.</h2>
             <p className="mx-auto mt-3 max-w-md text-ink-300">Без карты, без регистрации — демо работает полностью в вашем браузере.</p>
             <LinkButton href="/store-builder" className="mt-7">
               Собрать мой магазин <ArrowRight size={16} />
@@ -293,7 +293,7 @@ function PricingCard({
       )}
       <h3 className={`font-semibold ${highlighted ? "text-white" : "text-ink-950 dark:text-white"}`}>{name}</h3>
       <div className="mt-3 flex items-baseline gap-1">
-        <span className={`text-4xl font-extrabold ${highlighted ? "text-white" : "text-ink-950 dark:text-white"}`}>{price}</span>
+        <span className={`font-display text-4xl font-semibold ${highlighted ? "text-white" : "text-ink-950 dark:text-white"}`}>{price}</span>
         <span className={highlighted ? "text-ink-400" : "text-ink-400"}>{period}</span>
       </div>
       <p className={`mt-2 text-sm ${highlighted ? "text-ink-300" : "text-ink-500 dark:text-ink-400"}`}>{body}</p>

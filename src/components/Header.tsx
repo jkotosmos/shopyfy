@@ -1,7 +1,18 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Menu, X, Sparkles } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Container, LinkButton } from "./ui";
+
+function Logo({ onClick }: { onClick?: () => void }) {
+  return (
+    <Link to="/" className="flex items-center gap-2.5 font-display text-lg font-semibold text-ink-950 dark:text-white" onClick={onClick}>
+      <span className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-700 font-display text-base font-semibold text-brand-50">
+        S
+      </span>
+      Shopyfy
+    </Link>
+  );
+}
 
 const NAV = [
   { to: "/store-builder", label: "Конструктор магазина" },
@@ -18,12 +29,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-ink-200/70 bg-white/80 backdrop-blur-lg dark:border-ink-800 dark:bg-ink-950/80">
       <Container className="flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 font-extrabold text-lg text-ink-950 dark:text-white" onClick={() => setOpen(false)}>
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-700 text-white">
-            <Sparkles size={16} />
-          </span>
-          Shopyfy
-        </Link>
+        <Logo onClick={() => setOpen(false)} />
 
         <nav className="hidden lg:flex items-center gap-1">
           {NAV.map((item) => (

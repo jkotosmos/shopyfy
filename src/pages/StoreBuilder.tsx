@@ -189,7 +189,7 @@ export function StoreBuilder() {
                 <Badge>{result.niche.emoji} {result.niche.label}</Badge>
                 <span className="text-xs font-medium text-ink-400">источник: {result.source}</span>
               </div>
-              <h3 className="mt-2 text-2xl font-bold text-ink-950 dark:text-white">{result.storeName}</h3>
+              <h3 className="mt-2 font-display text-2xl font-semibold text-ink-950 dark:text-white">{result.storeName}</h3>
               <p className="flex items-center gap-1.5 text-sm text-ink-500 dark:text-ink-400"><Globe size={14} /> {result.domainSuggestion}</p>
             </div>
             <div className="flex gap-2">
@@ -209,7 +209,7 @@ export function StoreBuilder() {
               <span className="ml-3 truncate text-xs text-ink-400">{result.domainSuggestion}</span>
             </div>
             <div className="bg-gradient-to-br from-brand-50 to-white px-6 py-12 text-center dark:from-ink-900 dark:to-ink-950">
-              <h2 className="mx-auto max-w-lg text-2xl font-bold text-ink-950 dark:text-white sm:text-3xl">{result.heroHeadline}</h2>
+              <h2 className="mx-auto max-w-lg font-display text-2xl font-semibold text-ink-950 dark:text-white sm:text-3xl">{result.heroHeadline}</h2>
               <p className="mx-auto mt-3 max-w-md text-sm text-ink-500 dark:text-ink-400">{result.heroSub}</p>
               <span className="mt-6 inline-flex rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white">Купить сейчас — ${result.price.toFixed(2)}</span>
             </div>

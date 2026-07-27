@@ -2,29 +2,42 @@
 
 @theme {
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, sans-serif;
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
 
-  --color-brand-50: #f0fdf6;
-  --color-brand-100: #dcfce9;
-  --color-brand-200: #b8f5d3;
-  --color-brand-300: #7fe8b3;
-  --color-brand-400: #3ed88d;
-  --color-brand-500: #17c26f;
-  --color-brand-600: #0da35c;
-  --color-brand-700: #0b814b;
-  --color-brand-800: #0d653e;
-  --color-brand-900: #0c5335;
+  /* Deep forest green — primary */
+  --color-brand-50: #eef4ef;
+  --color-brand-100: #dbe9dc;
+  --color-brand-200: #b3d1b6;
+  --color-brand-300: #86b48c;
+  --color-brand-400: #5a9463;
+  --color-brand-500: #35713f;
+  --color-brand-600: #285a32;
+  --color-brand-700: #204628;
+  --color-brand-800: #1a3720;
+  --color-brand-900: #142b1a;
 
-  --color-ink-50: #f6f7f9;
-  --color-ink-100: #eceef2;
-  --color-ink-200: #d7dae2;
-  --color-ink-300: #b3b9c7;
-  --color-ink-400: #8890a3;
-  --color-ink-500: #666e83;
-  --color-ink-600: #4e5568;
-  --color-ink-700: #3b4051;
-  --color-ink-800: #262a36;
-  --color-ink-900: #14161d;
-  --color-ink-950: #0a0b10;
+  /* Warm terracotta — secondary accent, used sparingly */
+  --color-accent-50: #fdf3ee;
+  --color-accent-100: #fbe3d5;
+  --color-accent-200: #f4c2a4;
+  --color-accent-300: #eb9c71;
+  --color-accent-400: #dd7947;
+  --color-accent-500: #c25f30;
+  --color-accent-600: #9f4a25;
+  --color-accent-700: #7c3a1e;
+
+  /* Warm neutrals instead of cool blue-grays */
+  --color-ink-50: #f7f5f1;
+  --color-ink-100: #efece4;
+  --color-ink-200: #ded8ca;
+  --color-ink-300: #c0b7a2;
+  --color-ink-400: #99907a;
+  --color-ink-500: #746c5c;
+  --color-ink-600: #585244;
+  --color-ink-700: #423d33;
+  --color-ink-800: #2b2822;
+  --color-ink-900: #1a1815;
+  --color-ink-950: #100f0c;
 }
 
 :root {
@@ -41,19 +54,19 @@ html {
 
 body {
   margin: 0;
-  background: #f7f8fa;
-  color: #1c1f27;
+  background: #f8f6f1;
+  color: #1a1815;
 }
 
 @media (prefers-color-scheme: dark) {
   body {
-    background: #0a0b10;
-    color: #e7e9ee;
+    background: #100f0c;
+    color: #eeebe4;
   }
 }
 
 ::selection {
-  background: rgba(23, 194, 111, 0.35);
+  background: rgba(53, 113, 63, 0.35);
 }
 
 .no-scrollbar::-webkit-scrollbar {
