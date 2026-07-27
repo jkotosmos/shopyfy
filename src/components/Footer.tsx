@@ -15,6 +15,8 @@ const FOOTER_LINKS: Record<Lang, { create: { label: string; to: string }[]; rese
       { label: "SEO-анализ сайта", to: "/tools/site-analyzer" },
       { label: "Калькулятор маржи", to: "/tools/profit-calculator" },
       { label: "Генератор текстов для рекламы", to: "/tools/ad-copy" },
+      { label: "Сценарии для видео-рекламы", to: "/tools/video-script" },
+      { label: "Генератор политик магазина", to: "/tools/policy-generator" },
       { label: "Сохранённые товары", to: "/saved" },
     ],
     company: [
@@ -34,6 +36,8 @@ const FOOTER_LINKS: Record<Lang, { create: { label: string; to: string }[]; rese
       { label: "Site SEO Analyzer", to: "/tools/site-analyzer" },
       { label: "Margin Calculator", to: "/tools/profit-calculator" },
       { label: "Ad Copy Generator", to: "/tools/ad-copy" },
+      { label: "Video Ad Script Generator", to: "/tools/video-script" },
+      { label: "Store Policy Generator", to: "/tools/policy-generator" },
       { label: "Saved Products", to: "/saved" },
     ],
     company: [

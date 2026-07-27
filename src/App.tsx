@@ -6,6 +6,8 @@ import { Trends } from "./pages/Trends";
 import { SiteAnalyzer } from "./pages/SiteAnalyzer";
 import { ProfitCalculator } from "./pages/ProfitCalculator";
 import { AdCopy } from "./pages/AdCopy";
+import { VideoScriptPage } from "./pages/VideoScript";
+import { PolicyGenerator } from "./pages/PolicyGenerator";
 import { Saved } from "./pages/Saved";
 import { Redeem } from "./pages/Redeem";
 import { NotFound } from "./pages/NotFound";
@@ -20,6 +22,8 @@ function App() {
         <Route path="/tools/site-analyzer" element={<SiteAnalyzer />} />
         <Route path="/tools/profit-calculator" element={<ProfitCalculator />} />
         <Route path="/tools/ad-copy" element={<AdCopy />} />
+        <Route path="/tools/video-script" element={<VideoScriptPage />} />
+        <Route path="/tools/policy-generator" element={<PolicyGenerator />} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/redeem" element={<Redeem />} />
         <Route path="*" element={<NotFound />} />

@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import {
   ArrowRight, Wand2, LayoutTemplate, FileText, PackagePlus, ShoppingCart, UploadCloud,
   Clock, DollarSign, TrendingUp, Calculator, MessageSquareText, Bookmark, Search,
-  ChevronDown, Check, Link2, BrainCircuit, Sparkles, Loader2, KeyRound,
+  ChevronDown, Check, Link2, BrainCircuit, Sparkles, Loader2, KeyRound, Clapperboard, Scale,
 } from "lucide-react";
 import { Badge, Button, Card, Container, Eyebrow, LinkButton, Modal, SectionTitle, Stat } from "../components/ui";
 import { useLanguage, type Lang } from "../lib/i18n";
@@ -50,6 +50,8 @@ const EXTRA_TOOLS: Record<Lang, { icon: typeof TrendingUp; title: string; body: 
     { icon: Search, title: "SEO-анализ сайта конкурента", body: "Отчёт в духе премиум-версии SimilarWeb: источники трафика, гео, органические и платные ключевые слова, бэклинки, соцсети, похожие сайты и технологии — по любому домену.", to: "/tools/site-analyzer", cta: "Проанализировать сайт" },
     { icon: Calculator, title: "Калькулятор маржи", body: "Учитывает себестоимость у поставщика, доставку, комиссию платёжки и расходы на рекламу, чтобы показать реальную маржу — или цену, нужную для целевой маржи.", to: "/tools/profit-calculator", cta: "Посчитать" },
     { icon: MessageSquareText, title: "Генератор рекламных текстов", body: "Пять рекламных ракурсов (любопытство, срочность, соцдоказательство, до/после…) плюс готовые хэштеги для TikTok и Instagram.", to: "/tools/ad-copy", cta: "Сгенерировать текст" },
+    { icon: Clapperboard, title: "Сценарии для видео-рекламы", body: "Готовые UGC-сценарии для TikTok/Reels: хук, покадровая раскадровка с текстом на экране и озвучкой, призыв к действию — снимай на телефон.", to: "/tools/video-script", cta: "Сгенерировать сценарий" },
+    { icon: Scale, title: "Генератор политик магазина", body: "Черновики Политики конфиденциальности, Условий использования и Политики возврата под ваш магазин — с пометкой, что это не юридическая консультация.", to: "/tools/policy-generator", cta: "Сгенерировать политики" },
     { icon: Bookmark, title: "Вотчлист сохранённых товаров", body: "Сохраняйте товары, которые изучаете, с заметками — хранится локально в браузере, аккаунт не нужен.", to: "/saved", cta: "Открыть вотчлист" },
   ],
   en: [
@@ -57,6 +59,8 @@ const EXTRA_TOOLS: Record<Lang, { icon: typeof TrendingUp; title: string; body: 
     { icon: Search, title: "Competitor site SEO analysis", body: "A report in the spirit of premium SimilarWeb: traffic sources, geography, organic and paid keywords, backlinks, social traffic, similar sites, and tech stack — for any domain.", to: "/tools/site-analyzer", cta: "Analyze a site" },
     { icon: Calculator, title: "Margin calculator", body: "Factors in supplier cost, shipping, payment fees, and ad spend to show real margin — or the price you'd need for a target margin.", to: "/tools/profit-calculator", cta: "Calculate" },
     { icon: MessageSquareText, title: "Ad copy generator", body: "Five ad angles (curiosity, urgency, social proof, before/after…) plus ready-made hashtags for TikTok and Instagram.", to: "/tools/ad-copy", cta: "Generate copy" },
+    { icon: Clapperboard, title: "Video ad script generator", body: "Ready-made UGC scripts for TikTok/Reels: hook, shot-by-shot breakdown with on-screen text and voiceover, and a closing CTA — filmable on a phone.", to: "/tools/video-script", cta: "Generate a script" },
+    { icon: Scale, title: "Store policy generator", body: "Draft Privacy Policy, Terms of Service, and Refund Policy for your store — clearly labeled as a starting point, not legal advice.", to: "/tools/policy-generator", cta: "Generate policies" },
     { icon: Bookmark, title: "Saved products watchlist", body: "Save products you're researching with notes — stored locally in your browser, no account needed.", to: "/saved", cta: "Open watchlist" },
   ],
 };
