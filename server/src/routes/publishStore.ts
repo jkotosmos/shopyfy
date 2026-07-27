@@ -53,8 +53,17 @@ export async function publishStore(req: Request, res: Response) {
   }
 
   const body = req.body as PublishStoreBody;
-  if (!body?.productName || !body?.price) {
-    return res.status(400).json({ error: "productName and price are required." });
+  if (typeof body?.productName !== "string" || !body.productName.trim()) {
+    return res.status(400).json({ error: "productName is required." });
+  }
+  if (typeof body?.price !== "number" || !Number.isFinite(body.price) || body.price <= 0) {
+    return res.status(400).json({ error: "price must be a positive number." });
+  }
+  if (body.collections !== undefined && !Array.isArray(body.collections)) {
+    return res.status(400).json({ error: "collections must be an array." });
+  }
+  if (body.usps !== undefined && !Array.isArray(body.usps)) {
+    return res.status(400).json({ error: "usps must be an array." });
   }
 
   const { shop, accessToken } = shopRecord;
