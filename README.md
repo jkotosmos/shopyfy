@@ -5,8 +5,10 @@ generated Shopify-style store (homepage, product pages, collections, bundle/cart
 upsells, suggested pricing), built and editable without code. Alongside the core
 generator, it adds a set of research tools aimed specifically at dropshippers.
 
-Everything runs client-side — no backend, no API keys, no signup. State (saved
-products) persists to `localStorage` only.
+The UI is in Russian. The frontend runs entirely client-side — no backend, no
+API keys, no signup required to try it. State (saved products) persists to
+`localStorage` only. An optional real backend for Shopify integration lives
+in [`server/`](./server) — see below.
 
 ## Features
 
@@ -17,8 +19,10 @@ products) persists to `localStorage` only.
 - **AI Page Builder** preview — generated sections shown as an editable outline.
 - **Bundle Upsells** and **Cart Upsells** — auto-suggested offers sized to the
   product's price point.
-- **One-click "Import to Shopify"** flow — shown as a guided demo step (this
-  prototype has no backend/OAuth, so it's presented transparently as a demo).
+- **One-click "Import to Shopify"** flow — by default shown as a guided demo
+  step. Set `VITE_SHOPIFY_BACKEND_URL` (see `.env.example`) to a deployed
+  instance of [`server/`](./server) to make this a real OAuth connect +
+  publish-to-Shopify flow instead.
 
 ### Added for dropshippers
 - **Trend Research** (`/trends`) — the main addition. Search any keyword or
@@ -49,6 +53,16 @@ npm run dev      # start dev server
 npm run build     # type-check + production build
 npm run preview   # preview the production build
 ```
+
+## Backend (optional): real Shopify connection
+
+[`server/`](./server) is an Express backend implementing Shopify OAuth (connect
+a seller's real store) and Admin API calls to publish a generated store as an
+actual draft product, with collections and a bundle discount code. It's a
+scaffold to build on, not deployed anywhere by default — see
+[`server/README.md`](./server/README.md) for setup, local testing via tunnel,
+and what to harden before pointing it at a real store (token storage,
+sessions, compliance webhooks).
 
 ## Notes
 

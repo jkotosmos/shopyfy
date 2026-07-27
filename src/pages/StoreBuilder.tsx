@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import {
   ArrowRight, Check, Loader2, Globe, Tag, TrendingUp, Bookmark, ExternalLink,
-  ShoppingBag, PackagePlus,
+  ShoppingBag, PackagePlus, Store as StoreIcon,
 } from "lucide-react";
 import { Badge, Button, Card, Container, Eyebrow, Modal, SectionTitle } from "../components/ui";
 import { generateStore, type GeneratedStore } from "../lib/generator";
 import { addSaved } from "../lib/storage";
+import {
+  getBackendUrl, getStoredSession, saveSession, isValidShopDomain, startConnect,
+  publishStore as publishStoreToShopify, type ShopifySession, type PublishStoreResult,
+} from "../lib/shopifyConnect";
 
 const EXAMPLES = [
   "https://www.aliexpress.com/item/1005006123456-portable-neck-fan-mini.html",
@@ -14,8 +18,11 @@ const EXAMPLES = [
   "https://www.alibaba.com/product-detail/mini-facial-massager-beauty-tool.html",
 ];
 
+const backendUrl = getBackendUrl();
+
 export function StoreBuilder() {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
   const [input, setInput] = useState(params.get("url") ?? "");
   const [building, setBuilding] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
@@ -25,12 +32,33 @@ export function StoreBuilder() {
   const timeouts = useRef<ReturnType<typeof setTimeout>[]>([]);
   const autoRan = useRef(false);
 
+  const [session, setSession] = useState<ShopifySession | null>(() => getStoredSession());
+  const [shopDomain, setShopDomain] = useState("");
+  const [publishing, setPublishing] = useState(false);
+  const [publishResult, setPublishResult] = useState<PublishStoreResult | null>(null);
+  const [publishError, setPublishError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const connectedShop = params.get("shopifyConnected");
+    const token = params.get("session");
+    if (connectedShop && token) {
+      const newSession = { shop: connectedShop, token };
+      saveSession(newSession);
+      setSession(newSession);
+      setImportOpen(true);
+      navigate("/store-builder", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   function runGeneration(value: string) {
     if (!value.trim()) return;
     timeouts.current.forEach(clearTimeout);
     timeouts.current = [];
     setSaved(false);
     setResult(null);
+    setPublishResult(null);
+    setPublishError(null);
     setBuilding(true);
     setStepIndex(0);
 
@@ -64,6 +92,33 @@ export function StoreBuilder() {
     if (!result) return;
     addSaved({ name: result.productName, category: result.niche.label, note: `Сгенерированный магазин: ${result.storeName} · рекомендованная цена $${result.price.toFixed(2)}` });
     setSaved(true);
+  }
+
+  function handleConnect(e: React.FormEvent) {
+    e.preventDefault();
+    if (!isValidShopDomain(shopDomain)) return;
+    startConnect(shopDomain);
+  }
+
+  async function handlePublish() {
+    if (!result) return;
+    setPublishing(true);
+    setPublishError(null);
+    try {
+      const publishResponse = await publishStoreToShopify({
+        productName: result.productName,
+        description: result.description,
+        usps: result.usps,
+        collections: result.collections,
+        price: result.price,
+        bundleUpsell: result.bundleUpsell,
+      });
+      setPublishResult(publishResponse);
+    } catch (err) {
+      setPublishError(err instanceof Error ? err.message : "Не удалось опубликовать магазин.");
+    } finally {
+      setPublishing(false);
+    }
   }
 
   return (
@@ -238,12 +293,72 @@ export function StoreBuilder() {
       )}
 
       <Modal open={importOpen} onClose={() => setImportOpen(false)} title="Импорт в Shopify">
-        <p>
-          В полноценном продукте этот шаг подключается к вашему магазину Shopify через OAuth и переносит
-          сгенерированную тему, страницы и блоки допродаж прямо в админку.
-        </p>
-        <p className="mt-2">Этот прототип работает без бэкенда, поэтому шаг импорта показан здесь только для демонстрации.</p>
-        <Button className="mt-4 w-full" onClick={() => setImportOpen(false)}>Понятно</Button>
+        {!backendUrl && (
+          <>
+            <p>
+              В полноценном продукте этот шаг подключается к вашему магазину Shopify через OAuth и переносит
+              сгенерированную тему, страницы и блоки допродаж прямо в админку.
+            </p>
+            <p className="mt-2">Этот прототип работает без бэкенда, поэтому шаг импорта показан здесь только для демонстрации.</p>
+            <Button className="mt-4 w-full" onClick={() => setImportOpen(false)}>Понятно</Button>
+          </>
+        )}
+
+        {backendUrl && !session && (
+          <form onSubmit={handleConnect}>
+            <p className="flex items-center gap-2 font-medium text-ink-900 dark:text-white">
+              <StoreIcon size={16} /> Подключите ваш магазин Shopify
+            </p>
+            <p className="mt-2 text-sm text-ink-500 dark:text-ink-400">
+              Вы перейдёте на страницу авторизации Shopify, чтобы разрешить доступ. Токен доступа остаётся на
+              бэкенде — фронтенд его не видит.
+            </p>
+            <input
+              value={shopDomain}
+              onChange={(e) => setShopDomain(e.target.value)}
+              placeholder="ваш-магазин.myshopify.com"
+              className="mt-3 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand-400 dark:border-ink-700 dark:bg-ink-900 dark:text-white"
+            />
+            <Button type="submit" className="mt-3 w-full" disabled={!isValidShopDomain(shopDomain)}>
+              Подключить магазин
+            </Button>
+          </form>
+        )}
+
+        {backendUrl && session && (
+          <div>
+            <p className="flex items-center gap-2 text-sm font-medium text-brand-700 dark:text-brand-400">
+              <Check size={15} /> Подключено: {session.shop}
+            </p>
+
+            {!publishResult && (
+              <>
+                <p className="mt-2 text-sm text-ink-500 dark:text-ink-400">
+                  Товар будет создан как черновик в вашем магазине — вы сможете проверить и опубликовать его
+                  из админки Shopify.
+                </p>
+                <Button className="mt-4 w-full" onClick={handlePublish} disabled={publishing}>
+                  {publishing ? <Loader2 size={16} className="animate-spin" /> : <StoreIcon size={16} />}
+                  {publishing ? "Публикуем…" : "Опубликовать товар"}
+                </Button>
+                {publishError && <p className="mt-2 text-sm text-red-500">{publishError}</p>}
+              </>
+            )}
+
+            {publishResult && (
+              <div className="mt-3 space-y-2 text-sm">
+                <p className="font-medium text-ink-900 dark:text-white">Готово — товар создан как черновик.</p>
+                <a href={publishResult.productAdminUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 font-medium text-brand-600 hover:underline dark:text-brand-400">
+                  Открыть в админке Shopify <ExternalLink size={13} />
+                </a>
+                {publishResult.discountCode && (
+                  <p className="text-ink-500 dark:text-ink-400">Промокод для bundle-скидки: <span className="font-mono font-semibold text-ink-900 dark:text-white">{publishResult.discountCode}</span></p>
+                )}
+                <Button className="mt-2 w-full" onClick={() => setImportOpen(false)}>Готово</Button>
+              </div>
+            )}
+          </div>
+        )}
       </Modal>
     </div>
   );
