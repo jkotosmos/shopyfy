@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight, Wand2, LayoutTemplate, FileText, PackagePlus, ShoppingCart, UploadCloud,
-  Clock, DollarSign, TrendingUp, Calculator, MessageSquareText, Bookmark,
+  Clock, DollarSign, TrendingUp, Calculator, MessageSquareText, Bookmark, Search,
   ChevronDown, Check, Link2, BrainCircuit, Sparkles,
 } from "lucide-react";
 import { Badge, Button, Card, Container, Eyebrow, LinkButton, SectionTitle, Stat } from "../components/ui";
@@ -25,6 +25,7 @@ const CORE_FEATURES = [
 
 const EXTRA_TOOLS = [
   { icon: TrendingUp, title: "Поиск трендовых товаров", body: "Подборка трендовых ниш плюс универсальный поиск по ключевому слову — каждое утверждение ведёт на Google Trends, TikTok, Meta Ad Library, Pinterest и другие источники, чтобы вы могли всё проверить сами.", to: "/trends", cta: "Смотреть тренды" },
+  { icon: Search, title: "SEO-анализ сайта конкурента", body: "Отчёт в духе премиум-версии SimilarWeb: источники трафика, гео, органические и платные ключевые слова, бэклинки, соцсети, похожие сайты и технологии — по любому домену.", to: "/tools/site-analyzer", cta: "Проанализировать сайт" },
   { icon: Calculator, title: "Калькулятор маржи", body: "Учитывает себестоимость у поставщика, доставку, комиссию платёжки и расходы на рекламу, чтобы показать реальную маржу — или цену, нужную для целевой маржи.", to: "/tools/profit-calculator", cta: "Посчитать" },
   { icon: MessageSquareText, title: "Генератор рекламных текстов", body: "Пять рекламных ракурсов (любопытство, срочность, соцдоказательство, до/после…) плюс готовые хэштеги для TikTok и Instagram.", to: "/tools/ad-copy", cta: "Сгенерировать текст" },
   { icon: Bookmark, title: "Вотчлист сохранённых товаров", body: "Сохраняйте товары, которые изучаете, с заметками — хранится локально в браузере, аккаунт не нужен.", to: "/saved", cta: "Открыть вотчлист" },

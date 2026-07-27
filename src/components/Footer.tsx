@@ -31,6 +31,7 @@ export function Footer() {
             title="Исследование"
             links={[
               { label: "Поиск трендов", to: "/trends" },
+              { label: "SEO-анализ сайта", to: "/tools/site-analyzer" },
               { label: "Калькулятор маржи", to: "/tools/profit-calculator" },
               { label: "Генератор текстов для рекламы", to: "/tools/ad-copy" },
               { label: "Сохранённые товары", to: "/saved" },

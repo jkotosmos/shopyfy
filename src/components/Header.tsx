@@ -6,6 +6,7 @@ import { Container, LinkButton } from "./ui";
 const NAV = [
   { to: "/store-builder", label: "Конструктор магазина" },
   { to: "/trends", label: "Поиск трендов" },
+  { to: "/tools/site-analyzer", label: "SEO-анализ сайта" },
   { to: "/tools/profit-calculator", label: "Калькулятор маржи" },
   { to: "/tools/ad-copy", label: "Тексты для рекламы" },
   { to: "/saved", label: "Сохранённое" },
