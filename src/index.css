@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, sans-serif;
+
+  --color-brand-50: #f0fdf6;
+  --color-brand-100: #dcfce9;
+  --color-brand-200: #b8f5d3;
+  --color-brand-300: #7fe8b3;
+  --color-brand-400: #3ed88d;
+  --color-brand-500: #17c26f;
+  --color-brand-600: #0da35c;
+  --color-brand-700: #0b814b;
+  --color-brand-800: #0d653e;
+  --color-brand-900: #0c5335;
+
+  --color-ink-50: #f6f7f9;
+  --color-ink-100: #eceef2;
+  --color-ink-200: #d7dae2;
+  --color-ink-300: #b3b9c7;
+  --color-ink-400: #8890a3;
+  --color-ink-500: #666e83;
+  --color-ink-600: #4e5568;
+  --color-ink-700: #3b4051;
+  --color-ink-800: #262a36;
+  --color-ink-900: #14161d;
+  --color-ink-950: #0a0b10;
+}
+
+:root {
+  color-scheme: light dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #f7f8fa;
+  color: #1c1f27;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #0a0b10;
+    color: #e7e9ee;
+  }
+}
+
+::selection {
+  background: rgba(23, 194, 111, 0.35);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.6s ease-out both;
+}
