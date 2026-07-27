@@ -18,4 +18,24 @@ export const env = {
   sessionSecret: required("SESSION_SECRET"),
   port: Number(process.env.PORT ?? 8787),
   dataDir: process.env.DATA_DIR ?? "./data",
+
+  // Payments (optional — the /api/checkout and /api/promo routes respond
+  // with a clear "not configured" error instead of crashing the server
+  // when these are unset, so the Shopify-only half of this backend keeps
+  // working without a Stripe account).
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+  stripePrices: {
+    starter: process.env.STRIPE_PRICE_STARTER,
+    growth: process.env.STRIPE_PRICE_GROWTH,
+    pro: process.env.STRIPE_PRICE_PRO,
+  },
+
+  // SMTP (optional — promo codes are still generated and stored without
+  // this, but won't be emailed; see mailer.ts).
+  smtpHost: process.env.SMTP_HOST,
+  smtpPort: Number(process.env.SMTP_PORT ?? 587),
+  smtpUser: process.env.SMTP_USER,
+  smtpPass: process.env.SMTP_PASS,
+  smtpFrom: process.env.SMTP_FROM ?? "Shopyfy <no-reply@example.com>",
 };

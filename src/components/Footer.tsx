@@ -7,6 +7,7 @@ const FOOTER_LINKS: Record<Lang, { create: { label: string; to: string }[]; rese
     create: [
       { label: "AI-конструктор магазина", to: "/store-builder" },
       { label: "Тарифы", to: "/#pricing" },
+      { label: "Активировать промокод", to: "/redeem" },
       { label: "Вопросы и ответы", to: "/#faq" },
     ],
     research: [
@@ -25,6 +26,7 @@ const FOOTER_LINKS: Record<Lang, { create: { label: string; to: string }[]; rese
     create: [
       { label: "AI Store Builder", to: "/store-builder" },
       { label: "Pricing", to: "/#pricing" },
+      { label: "Activate promo code", to: "/redeem" },
       { label: "FAQ", to: "/#faq" },
     ],
     research: [

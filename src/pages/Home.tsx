@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   ArrowRight, Wand2, LayoutTemplate, FileText, PackagePlus, ShoppingCart, UploadCloud,
   Clock, DollarSign, TrendingUp, Calculator, MessageSquareText, Bookmark, Search,
-  ChevronDown, Check, Link2, BrainCircuit, Sparkles,
+  ChevronDown, Check, Link2, BrainCircuit, Sparkles, Loader2, KeyRound,
 } from "lucide-react";
-import { Badge, Button, Card, Container, Eyebrow, LinkButton, SectionTitle, Stat } from "../components/ui";
+import { Badge, Button, Card, Container, Eyebrow, LinkButton, Modal, SectionTitle, Stat } from "../components/ui";
 import { useLanguage, type Lang } from "../lib/i18n";
+import { startCheckout, type Plan } from "../lib/payments";
+import { getBackendUrl } from "../lib/backend";
 
 const STEPS: Record<Lang, { icon: typeof Link2; title: string; body: string }[]> = {
   ru: [
@@ -91,16 +93,16 @@ const FAQS: Record<Lang, { q: string; a: string }[]> = {
   ],
 };
 
-const PRICING: Record<Lang, { name: string; period: string; body: string; features: string[]; cta: string }[]> = {
+const PRICING: Record<Lang, { plan: Plan; name: string; period: string; body: string; features: string[]; cta: string }[]> = {
   ru: [
-    { name: "Starter", period: "/мес", body: "Попробуйте AI-конструктор магазина и все инструменты исследования.", features: ["1 сгенерированный магазин", "Инструмент поиска трендов", "Калькулятор маржи", "Генератор рекламных текстов"], cta: "Начать" },
-    { name: "Growth", period: "/мес", body: "Для дропшипперов, активно запускающих магазины.", features: ["Неограниченное число магазинов", "Импорт в Shopify в один клик", "Конструктор bundle- и cart-допродаж", "Вотчлист сохранённых товаров", "Приоритетная поддержка"], cta: "Начать" },
-    { name: "Pro", period: "/мес", body: "Для команд, ведущих несколько магазинов.", features: ["Всё из Growth", "Несколько мест в команде", "Массовая генерация страниц товаров", "Библиотека кастомных секций"], cta: "Начать" },
+    { plan: "starter", name: "Starter", period: "/мес", body: "Попробуйте AI-конструктор магазина и все инструменты исследования.", features: ["1 сгенерированный магазин", "Инструмент поиска трендов", "Калькулятор маржи", "Генератор рекламных текстов"], cta: "Начать бесплатно" },
+    { plan: "growth", name: "Growth", period: "/мес", body: "Для дропшипперов, активно запускающих магазины.", features: ["Неограниченное число магазинов", "Импорт в Shopify в один клик", "Конструктор bundle- и cart-допродаж", "Вотчлист сохранённых товаров", "Приоритетная поддержка"], cta: "Купить Growth" },
+    { plan: "pro", name: "Pro", period: "/мес", body: "Для команд, ведущих несколько магазинов.", features: ["Всё из Growth", "Несколько мест в команде", "Массовая генерация страниц товаров", "Библиотека кастомных секций"], cta: "Купить Pro" },
   ],
   en: [
-    { name: "Starter", period: "/mo", body: "Try the AI store builder and every research tool.", features: ["1 generated store", "Trend research tool", "Margin calculator", "Ad copy generator"], cta: "Get started" },
-    { name: "Growth", period: "/mo", body: "For dropshippers actively launching stores.", features: ["Unlimited stores", "One-click Shopify import", "Bundle & cart upsell builder", "Saved products watchlist", "Priority support"], cta: "Get started" },
-    { name: "Pro", period: "/mo", body: "For teams running multiple stores.", features: ["Everything in Growth", "Multiple team seats", "Bulk product page generation", "Custom section library"], cta: "Get started" },
+    { plan: "starter", name: "Starter", period: "/mo", body: "Try the AI store builder and every research tool.", features: ["1 generated store", "Trend research tool", "Margin calculator", "Ad copy generator"], cta: "Start free" },
+    { plan: "growth", name: "Growth", period: "/mo", body: "For dropshippers actively launching stores.", features: ["Unlimited stores", "One-click Shopify import", "Bundle & cart upsell builder", "Saved products watchlist", "Priority support"], cta: "Buy Growth" },
+    { plan: "pro", name: "Pro", period: "/mo", body: "For teams running multiple stores.", features: ["Everything in Growth", "Multiple team seats", "Bulk product page generation", "Custom section library"], cta: "Buy Pro" },
   ],
 };
 
@@ -117,6 +119,9 @@ const HOME_TEXT: Record<Lang, {
   benefitCostTitle: string; benefitCostBody: string;
   diffEyebrow: string; diffTitle: string; diffBody: string;
   pricingEyebrow: string; pricingTitle: string; mostPopular: string;
+  havePromoCode: string; redeemLink: string;
+  checkoutDemoTitle: string; checkoutDemoP1: string; checkoutDemoP2: string; checkoutDemoGotIt: string;
+  checkoutError: string;
   faqEyebrow: string; faqTitle: string;
   ctaTitle: string; ctaSub: string; ctaButton: string;
 }> = {
@@ -139,6 +144,11 @@ const HOME_TEXT: Record<Lang, {
     diffEyebrow: "Не очередной генератор шаблонов", diffTitle: "Построено вокруг вашего товара, а не переработанного макета",
     diffBody: "Обычные AI-конструкторы сайтов переиспользуют одну и ту же горстку шаблонов для всех. Shopyfy сначала анализирует конкретный товар и проводит лёгкое исследование рынка, поэтому структура, тексты и предложения реально соответствуют тому, что вы продаёте.",
     pricingEyebrow: "Тарифы", pricingTitle: "Начните бесплатно, обновитесь, когда начнёте продавать", mostPopular: "Самый популярный",
+    havePromoCode: "Уже есть промокод?", redeemLink: "Активировать",
+    checkoutDemoTitle: "Оплата", checkoutDemoGotIt: "Понятно",
+    checkoutDemoP1: "В полноценном продукте эта кнопка ведёт на страницу оплаты Stripe. После оплаты промокод для активации тарифа приходит на email — деньги поступают напрямую на счёт владельца сайта, минуя нас.",
+    checkoutDemoP2: "Этот прототип развёрнут без бэкенда для оплаты, поэтому здесь показано только объяснение процесса.",
+    checkoutError: "Не удалось перейти к оплате.",
     faqEyebrow: "Вопросы и ответы", faqTitle: "Отвечаем на частые вопросы",
     ctaTitle: "Вставьте ссылку. Увидьте свой магазин за секунды.", ctaSub: "Без карты, без регистрации — демо работает полностью в вашем браузере.", ctaButton: "Собрать мой магазин",
   },
@@ -161,6 +171,11 @@ const HOME_TEXT: Record<Lang, {
     diffEyebrow: "Not another template generator", diffTitle: "Built around your product, not a reworked layout",
     diffBody: "Typical AI site builders reuse the same handful of templates for everyone. Shopyfy analyzes the specific product first and does light market research, so the structure, copy, and offers actually match what you're selling.",
     pricingEyebrow: "Pricing", pricingTitle: "Start free, upgrade once you start selling", mostPopular: "Most popular",
+    havePromoCode: "Already have a promo code?", redeemLink: "Activate it",
+    checkoutDemoTitle: "Checkout", checkoutDemoGotIt: "Got it",
+    checkoutDemoP1: "In a full product, this button goes to Stripe's payment page. After payment, a promo code to activate the plan is emailed to you — the money goes straight to the site owner's account, never through us.",
+    checkoutDemoP2: "This prototype is deployed without a payments backend, so this is shown for explanation only.",
+    checkoutError: "Couldn't start checkout.",
     faqEyebrow: "FAQ", faqTitle: "Frequently asked questions",
     ctaTitle: "Paste a link. See your store in seconds.", ctaSub: "No card, no signup — the demo runs entirely in your browser.", ctaButton: "Build my store",
   },
@@ -168,6 +183,7 @@ const HOME_TEXT: Record<Lang, {
 
 export function Home() {
   const [url, setUrl] = useState("");
+  const [checkoutModalOpen, setCheckoutModalOpen] = useState(false);
   const navigate = useNavigate();
   const { lang } = useLanguage();
   const tx = HOME_TEXT[lang];
@@ -335,6 +351,7 @@ export function Home() {
             {PRICING[lang].map((plan, i) => (
               <PricingCard
                 key={plan.name}
+                plan={plan.plan}
                 name={plan.name}
                 price={i === 0 ? "$0" : i === 1 ? "$39" : "$99"}
                 period={plan.period}
@@ -343,11 +360,23 @@ export function Home() {
                 cta={plan.cta}
                 highlighted={i === 1}
                 mostPopularLabel={tx.mostPopular}
+                lang={lang}
+                checkoutErrorText={tx.checkoutError}
+                onShowDemoModal={() => setCheckoutModalOpen(true)}
               />
             ))}
           </div>
+          <p className="mt-8 text-center text-sm text-ink-500 dark:text-ink-400">
+            {tx.havePromoCode} <Link to="/redeem" className="font-medium text-brand-600 hover:underline dark:text-brand-400">{tx.redeemLink}</Link>
+          </p>
         </Container>
       </section>
+
+      <Modal open={checkoutModalOpen} onClose={() => setCheckoutModalOpen(false)} title={tx.checkoutDemoTitle}>
+        <p>{tx.checkoutDemoP1}</p>
+        <p className="mt-2">{tx.checkoutDemoP2}</p>
+        <Button className="mt-4 w-full" onClick={() => setCheckoutModalOpen(false)}>{tx.checkoutDemoGotIt}</Button>
+      </Modal>
 
       {/* FAQ */}
       <section id="faq" className="border-t border-ink-200 bg-white py-20 dark:border-ink-800 dark:bg-ink-950">
@@ -393,8 +422,29 @@ function BenefitCard({ icon: Icon, title, body }: { icon: typeof Clock; title: s
 }
 
 function PricingCard({
-  name, price, period, body, features, highlighted, cta, mostPopularLabel,
-}: { name: string; price: string; period: string; body: string; features: string[]; highlighted?: boolean; cta: string; mostPopularLabel: string }) {
+  plan, name, price, period, body, features, highlighted, cta, mostPopularLabel, lang, checkoutErrorText, onShowDemoModal,
+}: {
+  plan: Plan; name: string; price: string; period: string; body: string; features: string[]; highlighted?: boolean;
+  cta: string; mostPopularLabel: string; lang: Lang; checkoutErrorText: string; onShowDemoModal: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleClick() {
+    if (!getBackendUrl()) {
+      onShowDemoModal();
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      await startCheckout(plan, lang);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : checkoutErrorText);
+      setLoading(false);
+    }
+  }
+
   return (
     <div className={`relative rounded-2xl border p-7 ${highlighted ? "border-brand-400 bg-ink-950 text-white shadow-xl shadow-brand-500/20" : "border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900/60"}`}>
       {highlighted && (
@@ -413,9 +463,16 @@ function PricingCard({
           </li>
         ))}
       </ul>
-      <LinkButton href="/store-builder" variant={highlighted ? "primary" : "outline"} className="mt-7 w-full">
-        {cta}
-      </LinkButton>
+      {plan === "starter" ? (
+        <LinkButton href="/store-builder" variant={highlighted ? "primary" : "outline"} className="mt-7 w-full">
+          {cta}
+        </LinkButton>
+      ) : (
+        <Button variant={highlighted ? "primary" : "outline"} className="mt-7 w-full" onClick={handleClick} disabled={loading}>
+          {loading ? <Loader2 size={16} className="animate-spin" /> : <KeyRound size={15} />} {cta}
+        </Button>
+      )}
+      {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
     </div>
   );
 }

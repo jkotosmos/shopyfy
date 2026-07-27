@@ -9,6 +9,7 @@ import { generateStore, type GeneratedStore } from "../lib/generator";
 import { addSaved } from "../lib/storage";
 import { nicheLabel } from "../lib/niches";
 import { useLanguage, type Lang } from "../lib/i18n";
+import { hasPlanAtLeast } from "../lib/payments";
 import {
   getBackendUrl, getStoredSession, saveSession, isValidShopDomain, startConnect,
   publishStore as publishStoreToShopify, type ShopifySession, type PublishStoreResult,
@@ -33,6 +34,7 @@ const TEXT: Record<Lang, {
   modalTitle: string; demoP1: string; demoP2: string; gotIt: string;
   connectTitle: string; connectBody: string; domainPlaceholder: string; connectBtn: string;
   connected: string; publishBody: string; publishing: string; publishBtn: string;
+  upsellBody: string; viewPricing: string; haveCode: string;
   doneTitle: string; openAdmin: string; discountCode: string; done: string;
 }> = {
   ru: {
@@ -58,6 +60,8 @@ const TEXT: Record<Lang, {
     connected: "Подключено",
     publishBody: "Товар будет создан как черновик в вашем магазине — вы сможете проверить и опубликовать его из админки Shopify.",
     publishing: "Публикуем…", publishBtn: "Опубликовать товар",
+    upsellBody: "Публикация в Shopify доступна на тарифе Growth и выше.",
+    viewPricing: "Смотреть тарифы", haveCode: "Есть промокод",
     doneTitle: "Готово — товар создан как черновик.", openAdmin: "Открыть в админке Shopify",
     discountCode: "Промокод для bundle-скидки", done: "Готово",
   },
@@ -84,6 +88,8 @@ const TEXT: Record<Lang, {
     connected: "Connected",
     publishBody: "The product will be created as a draft in your store — you can review and publish it from the Shopify admin.",
     publishing: "Publishing…", publishBtn: "Publish product",
+    upsellBody: "Publishing to Shopify is available on the Growth plan and above.",
+    viewPricing: "View pricing", haveCode: "Have a promo code",
     doneTitle: "Done — product created as a draft.", openAdmin: "Open in Shopify admin",
     discountCode: "Bundle discount code", done: "Done",
   },
@@ -192,7 +198,7 @@ export function StoreBuilder() {
         collections: result.collections,
         price: result.price,
         bundleUpsell: result.bundleUpsell,
-      });
+      }, lang);
       setPublishResult(publishResponse);
     } catch (err) {
       setPublishError(err instanceof Error ? err.message : (lang === "en" ? "Failed to publish the store." : "Не удалось опубликовать магазин."));
@@ -403,14 +409,24 @@ export function StoreBuilder() {
             </p>
 
             {!publishResult && (
-              <>
-                <p className="mt-2 text-sm text-ink-500 dark:text-ink-400">{tx.publishBody}</p>
-                <Button className="mt-4 w-full" onClick={handlePublish} disabled={publishing}>
-                  {publishing ? <Loader2 size={16} className="animate-spin" /> : <StoreIcon size={16} />}
-                  {publishing ? tx.publishing : tx.publishBtn}
-                </Button>
-                {publishError && <p className="mt-2 text-sm text-red-500">{publishError}</p>}
-              </>
+              hasPlanAtLeast("growth") ? (
+                <>
+                  <p className="mt-2 text-sm text-ink-500 dark:text-ink-400">{tx.publishBody}</p>
+                  <Button className="mt-4 w-full" onClick={handlePublish} disabled={publishing}>
+                    {publishing ? <Loader2 size={16} className="animate-spin" /> : <StoreIcon size={16} />}
+                    {publishing ? tx.publishing : tx.publishBtn}
+                  </Button>
+                  {publishError && <p className="mt-2 text-sm text-red-500">{publishError}</p>}
+                </>
+              ) : (
+                <div className="mt-3 rounded-xl border border-dashed border-ink-300 p-4 text-sm dark:border-ink-700">
+                  <p className="text-ink-600 dark:text-ink-300">{tx.upsellBody}</p>
+                  <div className="mt-3 flex gap-2">
+                    <Link to="/#pricing" className="flex-1 rounded-lg border border-ink-200 px-3 py-2 text-center text-xs font-semibold text-ink-700 hover:border-brand-400 dark:border-ink-700 dark:text-ink-200">{tx.viewPricing}</Link>
+                    <Link to="/redeem" className="flex-1 rounded-lg bg-brand-600 px-3 py-2 text-center text-xs font-semibold text-white hover:bg-brand-700">{tx.haveCode}</Link>
+                  </div>
+                </div>
+              )
             )}
 
             {publishResult && (

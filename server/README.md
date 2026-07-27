@@ -1,16 +1,20 @@
-# Shopyfy backend (Shopify OAuth + Admin API scaffold)
+# Shopyfy backend (Shopify OAuth + payments scaffold)
 
-This is what actually connects to a seller's Shopify account and publishes
-the AI-generated store as a real product — the part the frontend prototype
-alone can't do, since a real Admin API access token must never be handled
-in browser JavaScript.
+This is what actually connects to a seller's Shopify account and takes real
+payment for a plan — the parts the frontend prototype alone can't do, since
+a real Admin API access token and real payment processing must never be
+handled in browser JavaScript.
 
-**Scope**: it does two things. (1) OAuth — a seller clicks "Connect", approves
+**Scope**: three things. (1) OAuth — a seller clicks "Connect", approves
 access on Shopify's own page, and this server exchanges the resulting code
 for an access token. (2) Publish — given the JSON the frontend's AI Store
 Builder already generates, it creates a draft product, a custom collection
 per generated collection name, and (if the generated bundle upsell has a
-percentage in it) a discount code implementing it.
+percentage in it) a discount code implementing it. (3) Payments — a buyer
+pays for a plan on Stripe's hosted Checkout page; once Stripe confirms the
+payment, a webhook here generates a promo code and emails it; entering that
+code on `/redeem` unlocks the plan in the browser (see
+[Payments & promo codes](#payments--promo-codes) below).
 
 It does **not** post ads to Meta/TikTok — see [Beyond Shopify](#beyond-shopify-posting-real-ads) at the bottom.
 
@@ -85,23 +89,86 @@ install screen. You'll land back on Store Builder connected, and can click
   UI a merchant sees requires a Shopify theme app extension or Shopify
   Function, which is a bigger, separate project.
 
-## 5. Before this touches a real, non-test store
+## 5. Payments & promo codes
+
+This is a **one-time-purchase → activation-code** flow, not full recurring
+subscription billing — it matches "pay once, get a code, redeem it" rather
+than building subscription lifecycle management (renewals, cancellations,
+dunning). If you want real recurring billing later, swap Checkout's
+`mode: "payment"` for `mode: "subscription"` and add handlers for
+`customer.subscription.updated`/`.deleted` in the webhook.
+
+1. Create a Stripe account (free, use test mode while building):
+   https://dashboard.stripe.com/register
+2. **API key**: Developers → API keys → copy the secret key into
+   `STRIPE_SECRET_KEY`. Use a `sk_test_...` key until you're ready to go live.
+3. **Prices**: Product catalog → create a product per plan → add a
+   **one-time** price to each → copy the `price_...` IDs into
+   `STRIPE_PRICE_STARTER` / `_GROWTH` / `_PRO` (leave a plan's var blank to
+   disable checkout for it — Starter is free in this app's pricing, so it's
+   never sent through Stripe at all).
+4. **Webhook**, for local testing:
+   ```bash
+   stripe listen --forward-to localhost:8787/api/webhooks/stripe
+   # prints a whsec_... value — put it in STRIPE_WEBHOOK_SECRET
+   ```
+   For a deployed backend, add the webhook endpoint in the Stripe Dashboard
+   (Developers → Webhooks → Add endpoint → `{HOST}/api/webhooks/stripe`,
+   subscribe to `checkout.session.completed`) and use the signing secret it
+   shows you there instead.
+5. **Email**: set `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` to
+   any SMTP provider (Gmail, SendGrid, Postmark, AWS SES, Resend's SMTP
+   endpoint — this isn't tied to one vendor). Without SMTP configured, the
+   promo code is still generated and stored after a real payment — check
+   the server log for it while testing.
+
+**Where the money goes**: directly into the Stripe account that owns
+`STRIPE_SECRET_KEY` — yours, once you set this up. This backend never
+collects, sees, or stores card details; Stripe's own hosted Checkout page
+does that. A promo code is generated *only* after Stripe's webhook confirms
+`checkout.session.completed` — there is no path in this app that grants
+access without a verified payment.
+
+**What redeeming a code unlocks**: `/redeem` exchanges a valid code for a
+signed entitlement token stored in the browser's `localStorage`. Right now
+exactly one thing in the frontend checks it: publishing a generated store
+to Shopify requires a Growth-or-higher entitlement (matching the pricing
+page's own claim that Shopify import is a paid-tier feature). The
+Pro-tier extras listed on the pricing page (team seats, bulk generation, a
+custom section library) are not built yet — add gates for those the same
+way (`hasPlanAtLeast("pro")` from `src/lib/payments.ts` on the frontend) as
+you build the features themselves.
+
+**Before this touches real money**:
+- `src/promoStore.ts` writes codes to a plain JSON file, same caveat as
+  token storage below — a promo code is a bearer credential, treat it
+  accordingly once this isn't a demo.
+- The entitlement token (`src/entitlement.ts`) has no revocation — there's
+  no way to invalidate someone's access after issuing it (e.g. for a
+  refund) short of rotating `SESSION_SECRET`, which invalidates *every*
+  outstanding token and OAuth session at once.
+- Add Stripe CLI / Dashboard monitoring for failed webhook deliveries in
+  production — a missed `checkout.session.completed` event means a real
+  paying customer never gets their code.
+
+## 6. Before this touches a real, non-test store
 
 This is a scaffold to build on, not production-ready as-is:
 
-- **Token storage** (`src/tokenStore.ts`) writes access tokens to a plain
-  JSON file with no encryption. Swap it for a real database and encrypt
-  tokens at rest (Shopify requires this for App Store review, and it's just
-  correct practice regardless — an Admin API token is equivalent to admin
-  login credentials for that store).
-- **Sessions** (`src/session.ts`) are a minimal signed token with no
-  revocation. Fine for trying this out; add real session infrastructure
-  (or a signed JWT library with expiry/rotation) before real users depend on it.
+- **Token storage** (`src/tokenStore.ts`, `src/promoStore.ts`) writes to
+  plain JSON files with no encryption. Swap both for a real database and
+  encrypt tokens at rest (Shopify requires this for App Store review, and
+  it's just correct practice regardless — an Admin API token is equivalent
+  to admin login credentials for that store).
+- **Sessions & entitlements** (`src/session.ts`, `src/entitlement.ts`) are
+  minimal signed tokens with no revocation. Fine for trying this out; add
+  real session infrastructure (or a signed JWT library with expiry/rotation
+  and a revocation list) before real users depend on it.
 - **Mandatory compliance webhooks**: Shopify requires apps to implement
   `customers/data_request`, `customers/redact`, and `shop/redact` webhooks
   before going live (even for unlisted public apps) — not implemented here.
 - Put this behind HTTPS in production (not optional — Shopify won't
-  redirect to a plain-HTTP `HOST` anyway).
+  redirect to a plain-HTTP `HOST` anyway, and Stripe strongly expects it).
 - The in-memory OAuth `state` nonce store (`shopifyAuth.ts`) works for a
   single server instance; move it to Redis (with a TTL) if you run more than one.
 

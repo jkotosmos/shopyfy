@@ -29,8 +29,15 @@ export function verifySessionToken(token: string | undefined): { shop: string } 
   const b = Buffer.from(signature, "utf8");
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
 
-  const [shop, expiryStr] = Buffer.from(encoded, "base64url").toString("utf8").split(".");
-  const expiry = Number(expiryStr);
+  // Split on the LAST dot only — shop is a domain like "my-store.myshopify.com"
+  // and can itself contain multiple dots, so a naive split(".") would chop it
+  // up incorrectly. The expiry is always a plain integer with no dots, so
+  // it's safe to peel off everything after the final dot.
+  const decoded = Buffer.from(encoded, "base64url").toString("utf8");
+  const sep = decoded.lastIndexOf(".");
+  if (sep === -1) return null;
+  const shop = decoded.slice(0, sep);
+  const expiry = Number(decoded.slice(sep + 1));
   if (!shop || !expiry || expiry < Date.now()) return null;
 
   return { shop };

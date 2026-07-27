@@ -3,6 +3,9 @@
 // VITE_SHOPIFY_BACKEND_URL isn't set, which is the default for this
 // prototype — the UI falls back to explaining the flow instead.
 
+import { getBackendUrl } from "./backend";
+import type { Lang } from "./i18n";
+
 const STORAGE_KEY = "shopyfy_shopify_session_v1";
 
 export interface ShopifySession {
@@ -10,10 +13,7 @@ export interface ShopifySession {
   token: string;
 }
 
-export function getBackendUrl(): string | null {
-  const url = import.meta.env.VITE_SHOPIFY_BACKEND_URL as string | undefined;
-  return url ? url.replace(/\/+$/, "") : null;
-}
+export { getBackendUrl };
 
 export function getStoredSession(): ShopifySession | null {
   try {
@@ -58,11 +58,11 @@ export interface PublishStoreResult {
   discountCode: string | null;
 }
 
-export async function publishStore(payload: PublishStorePayload): Promise<PublishStoreResult> {
+export async function publishStore(payload: PublishStorePayload, lang: Lang = "ru"): Promise<PublishStoreResult> {
   const backendUrl = getBackendUrl();
   const session = getStoredSession();
   if (!backendUrl || !session) {
-    throw new Error("Магазин Shopify не подключён.");
+    throw new Error(lang === "en" ? "Shopify store is not connected." : "Магазин Shopify не подключён.");
   }
 
   const res = await fetch(`${backendUrl}/api/stores/publish`, {
@@ -76,7 +76,7 @@ export async function publishStore(payload: PublishStorePayload): Promise<Publis
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(body.error ?? `Публикация не удалась (${res.status})`);
+    throw new Error(body.error ?? (lang === "en" ? `Publish failed (${res.status})` : `Публикация не удалась (${res.status})`));
   }
 
   return res.json() as Promise<PublishStoreResult>;

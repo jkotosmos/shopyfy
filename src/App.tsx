@@ -7,6 +7,7 @@ import { SiteAnalyzer } from "./pages/SiteAnalyzer";
 import { ProfitCalculator } from "./pages/ProfitCalculator";
 import { AdCopy } from "./pages/AdCopy";
 import { Saved } from "./pages/Saved";
+import { Redeem } from "./pages/Redeem";
 import { NotFound } from "./pages/NotFound";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/tools/profit-calculator" element={<ProfitCalculator />} />
         <Route path="/tools/ad-copy" element={<AdCopy />} />
         <Route path="/saved" element={<Saved />} />
+        <Route path="/redeem" element={<Redeem />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
