@@ -8,6 +8,7 @@ import { publishStore } from "./routes/publishStore.js";
 import { createCheckoutSession } from "./routes/checkout.js";
 import { handleStripeWebhook } from "./routes/stripeWebhook.js";
 import { redeemPromoCode } from "./routes/redeem.js";
+import { getMarketData } from "./routes/marketData.js";
 import { asyncHandler } from "./asyncHandler.js";
 
 const app = express();
@@ -30,6 +31,10 @@ const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, standardHea
 const publishLimiter = rateLimit({ windowMs: 60 * 1000, limit: 10, standardHeaders: true, legacyHeaders: false });
 const checkoutLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false });
 const redeemLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false });
+// Tighter limit than the others on purpose: the upstream providers here
+// (SerpApi especially) meter usage/cost per call, so this protects your
+// quota from abuse if this backend is ever left publicly reachable.
+const marketDataLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false });
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
@@ -45,6 +50,10 @@ app.post("/api/stores/publish", publishLimiter, asyncHandler(publishStore));
 // (above) emails a promo code -> redeem it here for an entitlement token.
 app.post("/api/checkout/create-session", checkoutLimiter, asyncHandler(createCheckoutSession));
 app.post("/api/promo/redeem", redeemLimiter, asyncHandler(redeemPromoCode));
+
+// Real trend/product/ad data for a keyword (Google Trends via SerpApi,
+// eBay Browse API, Meta Ad Library) — see routes/marketData.ts.
+app.get("/api/market-data", marketDataLimiter, asyncHandler(getMarketData));
 
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error("Unhandled request error:", err);

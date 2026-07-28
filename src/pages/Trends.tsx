@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   Search, ExternalLink, BarChart3, Music2, Megaphone, Image as ImageIcon,
-  Video, MessageCircle, ShoppingCart, ShoppingBag, Bookmark, ChevronDown, ChevronUp, Clock,
+  Video, MessageCircle, ShoppingCart, ShoppingBag, Bookmark, ChevronDown, ChevronUp, Clock, Loader2, Info,
 } from "lucide-react";
 import { Badge, Card, Container, Eyebrow, SectionTitle } from "../components/ui";
-import { buildResearchLinks, getTrendingNiches, type ResearchLink, type TrendingNiche } from "../lib/trends";
+import { buildResearchLinks, getTrendingNiches, estimateTopCountry, type ResearchLink, type TrendingNiche, type TopCountry } from "../lib/trends";
 import { generateAdLibraryEntries, type AdLibraryEntry } from "../lib/adLibrary";
+import { fetchRealMarketData, isMarketDataBackendConfigured, type RealMarketData, type RealAd } from "../lib/marketData";
 import { addSaved } from "../lib/storage";
 import { useLanguage, type Lang } from "../lib/i18n";
 
@@ -21,14 +22,19 @@ const PLATFORM_ICON: Record<string, typeof Search> = {
   Amazon: ShoppingBag,
 };
 
-const TEXT: Record<Lang, {
+interface TrendsText {
   eyebrow: string; title: string; sub: string; placeholder: string; submit: string;
   sourcesFor: string; sourcesHint: string;
   starterEyebrow: string; starterTitle: string; starterSub: string;
   all: string; showSources: string; hideSources: string; saveToWatchlist: string;
   signalLabel: string;
   adLibraryTitle: string; adLibraryDisclaimer: string; runningFor: string; days: string;
-}> = {
+  realBadge: string; demoBadge: string; topCountryLabel: string; estimateLabel: string;
+  realInterestLabel: string; realProductsTitle: string; runningSince: string; loadingReal: string;
+  notConfiguredHint: string;
+}
+
+const TEXT: Record<Lang, TrendsText> = {
   ru: {
     eyebrow: "Поиск трендов",
     title: "Найдите, что популярно — и точно узнайте, откуда это известно",
@@ -42,6 +48,10 @@ const TEXT: Record<Lang, {
     signalLabel: "Сигнал",
     adLibraryTitle: "Примеры активной рекламы", runningFor: "Активна", days: "дн.",
     adLibraryDisclaimer: "Иллюстративные примеры в стиле типичных объявлений в этой нише — не реальные объявления. Проверьте, что крутится по-настоящему, по ссылке «Meta Ad Library» выше.",
+    realBadge: "Реально", demoBadge: "Демо", topCountryLabel: "Чаще всего ищут в", estimateLabel: "оценка",
+    realInterestLabel: "реальный интерес в поиске (Google Trends, 90 дней)", realProductsTitle: "Реальные товары (eBay)",
+    runningSince: "Показывается с", loadingReal: "Загружаем реальные данные…",
+    notConfiguredHint: "Чтобы видеть здесь реальные данные (Google Trends, eBay, Meta Ad Library) вместо иллюстративных примеров, разверните бэкенд из server/ и настройте SERPAPI_KEY / EBAY_APP_ID / META_ADS_APP_ID — см. server/README.md.",
   },
   en: {
     eyebrow: "Trend Research",
@@ -56,8 +66,21 @@ const TEXT: Record<Lang, {
     signalLabel: "Signal",
     adLibraryTitle: "Example ads currently running", runningFor: "Running for", days: "days",
     adLibraryDisclaimer: "Illustrative examples styled after typical ads in this niche — not real ads. Check what's actually running via the \"Meta Ad Library\" link above.",
+    realBadge: "Real", demoBadge: "Demo", topCountryLabel: "Most searched in", estimateLabel: "estimate",
+    realInterestLabel: "real search interest (Google Trends, 90 days)", realProductsTitle: "Real products (eBay)",
+    runningSince: "Running since", loadingReal: "Loading real data…",
+    notConfiguredHint: "To see real data here (Google Trends, eBay, Meta Ad Library) instead of illustrative examples, deploy the backend in server/ and configure SERPAPI_KEY / EBAY_APP_ID / META_ADS_APP_ID — see server/README.md.",
   },
 };
+
+function RealBadge({ label }: { label: string }) {
+  return <span className="rounded-full bg-brand-100 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700 dark:bg-brand-950/50 dark:text-brand-300">{label}</span>;
+}
+
+function countryCodeToFlag(code: string): string {
+  if (!/^[A-Za-z]{2}$/.test(code)) return "🌍";
+  return code.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0)));
+}
 
 function LinkGrid({ links }: { links: ResearchLink[] }) {
   return (
@@ -88,11 +111,11 @@ function LinkGrid({ links }: { links: ResearchLink[] }) {
   );
 }
 
-function AdLibraryGrid({ entries, tx }: { entries: AdLibraryEntry[]; tx: { adLibraryTitle: string; adLibraryDisclaimer: string; runningFor: string; days: string } }) {
+function AdLibraryGrid({ entries, tx }: { entries: AdLibraryEntry[]; tx: TrendsText }) {
   return (
     <div className="mt-4">
       <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
-        <Megaphone size={13} /> {tx.adLibraryTitle}
+        <Megaphone size={13} /> {tx.adLibraryTitle} <RealBadge label={tx.demoBadge} />
       </h4>
       <div className="mt-2.5 grid gap-2.5 sm:grid-cols-3">
         {entries.map((entry) => (
@@ -123,6 +146,118 @@ function AdLibraryGrid({ entries, tx }: { entries: AdLibraryEntry[]; tx: { adLib
   );
 }
 
+function RealAdsGrid({ ads, tx, lang }: { ads: RealAd[]; tx: TrendsText; lang: Lang }) {
+  const locale = lang === "en" ? "en-US" : "ru-RU";
+  return (
+    <div className="mt-4">
+      <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
+        <Megaphone size={13} /> {tx.adLibraryTitle} <RealBadge label={tx.realBadge} />
+      </h4>
+      <div className="mt-2.5 grid gap-2.5 sm:grid-cols-3">
+        {ads.map((ad, i) => (
+          <div key={i} className="rounded-xl border border-ink-200 p-3 text-xs dark:border-ink-700">
+            <p className="font-semibold text-ink-900 dark:text-white">{ad.pageName}</p>
+            {ad.body && <p className="mt-1 line-clamp-3 text-ink-500 dark:text-ink-400">{ad.body}</p>}
+            {ad.platforms.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {ad.platforms.map((p) => (
+                  <span key={p} className="rounded-full bg-ink-100 px-1.5 py-0.5 text-[10px] text-ink-500 dark:bg-ink-800 dark:text-ink-400">{p}</span>
+                ))}
+              </div>
+            )}
+            {ad.startDate && <p className="mt-1.5 text-ink-400">{tx.runningSince} {new Date(ad.startDate).toLocaleDateString(locale)}</p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MarketDataPanel({ keyword, lang, tx }: { keyword: string; lang: Lang; tx: TrendsText }) {
+  const [data, setData] = useState<RealMarketData | null>(null);
+  const [loading, setLoading] = useState(isMarketDataBackendConfigured());
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!isMarketDataBackendConfigured()) return;
+    setLoading(true);
+    fetchRealMarketData(keyword).then((result) => {
+      if (!cancelled) {
+        setData(result);
+        setLoading(false);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [keyword]);
+
+  const realCountry = data?.trends?.topCountries?.[0];
+  const topCountry: TopCountry = realCountry
+    ? { flag: countryCodeToFlag(realCountry.countryCode), name: realCountry.country, real: true }
+    : estimateTopCountry(keyword, lang);
+
+  return (
+    <div className="mt-4 border-t border-ink-200 pt-4 dark:border-ink-800">
+      <LinkGrid links={buildResearchLinks(keyword, lang)} />
+
+      <p className="mt-3 flex items-center gap-1.5 text-sm text-ink-600 dark:text-ink-300">
+        <span>{topCountry.flag}</span> {tx.topCountryLabel}: <strong className="text-ink-900 dark:text-white">{topCountry.name}</strong>
+        {topCountry.real ? <RealBadge label={tx.realBadge} /> : <span className="text-xs text-ink-400">({tx.estimateLabel})</span>}
+      </p>
+
+      {loading && (
+        <p className="mt-3 flex items-center gap-1.5 text-xs text-ink-400"><Loader2 size={12} className="animate-spin" /> {tx.loadingReal}</p>
+      )}
+
+      {data?.trends && (
+        <p className="mt-2 text-xs text-ink-500 dark:text-ink-400">
+          <strong className="text-ink-900 dark:text-white">{data.trends.averageInterest}/100</strong> {tx.realInterestLabel} <RealBadge label={tx.realBadge} />
+        </p>
+      )}
+
+      {data?.products && data.products.length > 0 && (
+        <div className="mt-4">
+          <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
+            <ShoppingBag size={13} /> {tx.realProductsTitle} <RealBadge label={tx.realBadge} />
+          </h4>
+          <div className="mt-2.5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+            {data.products.slice(0, 4).map((p) => (
+              <a
+                key={p.url}
+                href={p.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-xl border border-ink-200 p-2 text-xs transition-colors hover:border-brand-400 dark:border-ink-700"
+              >
+                {p.image && <img src={p.image} alt="" className="mb-2 h-20 w-full rounded-lg object-cover" />}
+                <p className="line-clamp-2 font-medium text-ink-800 dark:text-ink-200">{p.title}</p>
+                {p.price != null && (
+                  <p className="mt-1 font-semibold text-ink-950 dark:text-white">
+                    {p.currency === "USD" ? "$" : `${p.currency ?? ""} `}{p.price.toFixed(2)}
+                  </p>
+                )}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {data?.ads && data.ads.length > 0 ? (
+        <RealAdsGrid ads={data.ads} tx={tx} lang={lang} />
+      ) : (
+        <AdLibraryGrid entries={generateAdLibraryEntries(keyword, lang)} tx={tx} />
+      )}
+
+      {!isMarketDataBackendConfigured() && (
+        <p className="mt-3 flex items-start gap-1.5 text-xs text-ink-400">
+          <Info size={12} className="mt-0.5 shrink-0" /> {tx.notConfiguredHint}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function Trends() {
   const [params] = useSearchParams();
   const { lang } = useLanguage();
@@ -139,8 +274,6 @@ export function Trends() {
     () => niches.filter((n) => category === tx.all || n.category === category),
     [niches, category, tx.all],
   );
-  const searchLinks = useMemo(() => (searched.trim() ? buildResearchLinks(searched, lang) : []), [searched, lang]);
-  const searchAds = useMemo(() => (searched.trim() ? generateAdLibraryEntries(searched, lang) : []), [searched, lang]);
 
   useEffect(() => {
     setCategory(tx.all);
@@ -188,10 +321,7 @@ export function Trends() {
           <Card>
             <h3 className="font-semibold text-ink-950 dark:text-white">{tx.sourcesFor} «{searched.trim()}»</h3>
             <p className="mt-1 text-sm text-ink-500 dark:text-ink-400">{tx.sourcesHint}</p>
-            <div className="mt-4">
-              <LinkGrid links={searchLinks} />
-            </div>
-            <AdLibraryGrid entries={searchAds} tx={tx} />
+            <MarketDataPanel keyword={searched.trim()} lang={lang} tx={tx} />
           </Card>
         </Container>
       )}
@@ -257,12 +387,7 @@ export function Trends() {
                   </button>
                 </div>
 
-                {open && (
-                  <div className="mt-4 border-t border-ink-200 pt-4 dark:border-ink-800">
-                    <LinkGrid links={buildResearchLinks(n.keyword, lang)} />
-                    <AdLibraryGrid entries={generateAdLibraryEntries(n.keyword, lang)} tx={tx} />
-                  </div>
-                )}
+                {open && <MarketDataPanel keyword={n.keyword} lang={lang} tx={tx} />}
               </Card>
             );
           })}

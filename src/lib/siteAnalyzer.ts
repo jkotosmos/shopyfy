@@ -87,12 +87,12 @@ export function normalizeDomain(rawInput: string): string {
   return value.includes(".") ? value : `${value}.com`;
 }
 
-const COUNTRY_FLAGS = ["🇺🇸", "🇬🇧", "🇩🇪", "🇨🇦", "🇫🇷", "🇦🇺", "🇧🇷", "🇮🇳", "🇪🇸", "🇮🇹", "🇳🇱", "🇵🇱", "🇲🇽", "🇯🇵", "🇦🇪"];
-const COUNTRY_NAMES: Record<Lang, string[]> = {
+export const COUNTRY_FLAGS = ["🇺🇸", "🇬🇧", "🇩🇪", "🇨🇦", "🇫🇷", "🇦🇺", "🇧🇷", "🇮🇳", "🇪🇸", "🇮🇹", "🇳🇱", "🇵🇱", "🇲🇽", "🇯🇵", "🇦🇪"];
+export const COUNTRY_NAMES: Record<Lang, string[]> = {
   ru: ["США", "Великобритания", "Германия", "Канада", "Франция", "Австралия", "Бразилия", "Индия", "Испания", "Италия", "Нидерланды", "Польша", "Мексика", "Япония", "ОАЭ"],
   en: ["United States", "United Kingdom", "Germany", "Canada", "France", "Australia", "Brazil", "India", "Spain", "Italy", "Netherlands", "Poland", "Mexico", "Japan", "UAE"],
 };
-function countries(lang: Lang) {
+export function countries(lang: Lang) {
   return COUNTRY_FLAGS.map((flag, i) => ({ flag, name: COUNTRY_NAMES[lang][i] }));
 }
 

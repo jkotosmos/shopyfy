@@ -5,7 +5,7 @@ payment for a plan — the parts the frontend prototype alone can't do, since
 a real Admin API access token and real payment processing must never be
 handled in browser JavaScript.
 
-**Scope**: three things. (1) OAuth — a seller clicks "Connect", approves
+**Scope**: four things. (1) OAuth — a seller clicks "Connect", approves
 access on Shopify's own page, and this server exchanges the resulting code
 for an access token. (2) Publish — given the JSON the frontend's AI Store
 Builder already generates, it creates a draft product, a custom collection
@@ -14,7 +14,10 @@ percentage in it) a discount code implementing it. (3) Payments — a buyer
 pays for a plan on Stripe's hosted Checkout page; once Stripe confirms the
 payment, a webhook here generates a promo code and emails it; entering that
 code on `/redeem` unlocks the plan in the browser (see
-[Payments & promo codes](#payments--promo-codes) below).
+[Payments & promo codes](#payments--promo-codes) below). (4) Real market
+data — real Google Trends interest/region data, real eBay listings, and
+real ads for a keyword, from third-party APIs (see
+[Real market data](#6-real-market-data) below).
 
 It does **not** post ads to Meta/TikTok — see [Beyond Shopify](#beyond-shopify-posting-real-ads) at the bottom.
 
@@ -151,7 +154,46 @@ you build the features themselves.
   production — a missed `checkout.session.completed` event means a real
   paying customer never gets their code.
 
-## 6. Before this touches a real, non-test store
+## 6. Real market data
+
+Powers `GET /api/market-data?q=<keyword>`, used by the frontend's Trend
+Research page. Each source below is independent — configure any subset;
+the endpoint returns `null` for whichever ones aren't set up, and the
+frontend falls back to its illustrative demo generator for that source
+specifically (never silently blending fabricated numbers into what's
+reported as real).
+
+**Google Trends (via SerpApi).** Google has no publicly-available official
+Trends API — a real one exists but is an invite-only alpha as of 2025. Real
+interest-over-time and interest-by-region data here goes through
+[SerpApi](https://serpapi.com)'s Google Trends endpoint instead: sign up,
+copy your API key into `SERPAPI_KEY`. The free trial covers a small number
+of searches; sustained use needs a paid plan. This is a deliberate choice
+of a documented, ToS-compliant third-party service — swap
+`src/serpapiClient.ts` for a different provider (HasData, Bright Data,
+Apify, etc.) if you'd rather not use SerpApi. The regional breakdown this
+returns is *search interest by country*, not sales data — it's the closest
+legitimate, freely-queryable proxy for "where does this sell" that exists
+without a sales-data API (which nothing public exposes).
+
+**eBay Browse API.** Free developer account at
+[developer.ebay.com](https://developer.ebay.com) → create an application
+keyset → put the **production** Client ID / Client Secret in `EBAY_APP_ID`
+/ `EBAY_CERT_ID` (`src/ebayClient.ts` uses OAuth2 client-credentials to get
+an app access token automatically, no further setup). Real listings — this
+is eBay's marketplace, not AliExpress, since AliExpress has no comparable
+self-serve product-search API for third parties.
+
+**Meta Ad Library API.** Create an app at
+[developers.facebook.com](https://developers.facebook.com), put its App ID
+/ App Secret in `META_ADS_APP_ID` / `META_ADS_APP_SECRET`
+(`src/metaAdsClient.ts` combines them into an app access token — no
+per-user OAuth flow needed). This covers basic keyword search over
+non-political/non-issue ads. Meta gates higher search volume, and any
+access to political/social-issue ads, behind a separate Ad Library API
+access review — expect friction here that the other two sources don't have.
+
+## 7. Before this touches a real, non-test store
 
 This is a scaffold to build on, not production-ready as-is:
 

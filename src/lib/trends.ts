@@ -6,12 +6,30 @@
 // а не принимать на веру.
 
 import type { Lang } from "./i18n";
+import { makeRng, pick } from "./seed";
+import { countries } from "./siteAnalyzer";
 
 export interface ResearchLink {
   label: string;
   platform: string;
   url: string;
   hint: string;
+}
+
+export interface TopCountry {
+  flag: string;
+  name: string;
+  real: boolean; // true = from real Google Trends regional data, false = illustrative guess
+}
+
+// Best-effort "where is this bought/searched most" — used as a fallback
+// whenever real regional interest data isn't available (no backend, or
+// SerpApi not configured). Deterministic per keyword, clearly marked
+// `real: false` so the UI can label it as an estimate, not a fact.
+export function estimateTopCountry(keyword: string, lang: Lang): TopCountry {
+  const rng = makeRng(`${keyword}|topcountry`);
+  const c = pick(rng, countries(lang));
+  return { flag: c.flag, name: c.name, real: false };
 }
 
 const LINK_TEXT: Record<Lang, { label: string; platform: string; hint: string }[]> = {

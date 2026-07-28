@@ -38,4 +38,31 @@ export const env = {
   smtpUser: process.env.SMTP_USER,
   smtpPass: process.env.SMTP_PASS,
   smtpFrom: process.env.SMTP_FROM ?? "Shopyfy <no-reply@example.com>",
+
+  // Real market data (all optional — /api/market-data reports per-source
+  // which of these are configured and returns null for the rest, so the
+  // frontend can fall back to the illustrative demo generators per-source
+  // instead of all-or-nothing).
+  //
+  // Google Trends has no general-access official API (only an invite-only
+  // alpha as of 2025), so real trend/interest-by-region data here goes
+  // through SerpApi's Google Trends endpoint instead — a paid third-party
+  // service with a small free trial. This is a deliberate, documented
+  // choice, not a stand-in for an official API; swap serpapiClient.ts for
+  // another provider (HasData, Bright Data, Apify, etc.) if you prefer.
+  serpApiKey: process.env.SERPAPI_KEY,
+
+  // eBay Browse API — free developer account, OAuth client-credentials
+  // (see developer.ebay.com). Gives real listings (title/price/condition/
+  // seller) for a keyword; it's eBay's marketplace, not AliExpress, since
+  // AliExpress has no comparable self-serve API.
+  ebayAppId: process.env.EBAY_APP_ID,
+  ebayCertId: process.env.EBAY_CERT_ID,
+
+  // Meta Ad Library API — a Meta developer app's ID+secret used as an app
+  // access token. Works for basic keyword search on non-political ads;
+  // higher volume / political-and-issue ads need Meta's separate ad-library
+  // access review. See server/README.md.
+  metaAdsAppId: process.env.META_ADS_APP_ID,
+  metaAdsAppSecret: process.env.META_ADS_APP_SECRET,
 };
