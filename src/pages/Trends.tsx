@@ -47,7 +47,7 @@ const TEXT: Record<Lang, TrendsText> = {
     all: "Все", showSources: "Показать источники", hideSources: "Скрыть источники", saveToWatchlist: "Сохранить в вотчлист",
     signalLabel: "Сигнал",
     adLibraryTitle: "Примеры активной рекламы", runningFor: "Активна", days: "дн.",
-    adLibraryDisclaimer: "Иллюстративные примеры в стиле типичных объявлений в этой нише — не реальные объявления. Проверьте, что крутится по-настоящему, по ссылке «Meta Ad Library» выше.",
+    adLibraryDisclaimer: "Иллюстративные примеры в стиле типичных объявлений в этой нише — не реальные объявления. Нажмите на карточку, чтобы открыть настоящий поиск по Meta Ad Library и увидеть, что крутится на самом деле.",
     realBadge: "Реально", demoBadge: "Демо", topCountryLabel: "Чаще всего ищут в", estimateLabel: "оценка",
     realInterestLabel: "реальный интерес в поиске (Google Trends, 90 дней)", realProductsTitle: "Реальные товары (eBay)",
     runningSince: "Показывается с", loadingReal: "Загружаем реальные данные…",
@@ -65,7 +65,7 @@ const TEXT: Record<Lang, TrendsText> = {
     all: "All", showSources: "Show sources", hideSources: "Hide sources", saveToWatchlist: "Save to watchlist",
     signalLabel: "Signal",
     adLibraryTitle: "Example ads currently running", runningFor: "Running for", days: "days",
-    adLibraryDisclaimer: "Illustrative examples styled after typical ads in this niche — not real ads. Check what's actually running via the \"Meta Ad Library\" link above.",
+    adLibraryDisclaimer: "Illustrative examples styled after typical ads in this niche — not real ads. Click a card to open a real Meta Ad Library search and see what's actually running.",
     realBadge: "Real", demoBadge: "Demo", topCountryLabel: "Most searched in", estimateLabel: "estimate",
     realInterestLabel: "real search interest (Google Trends, 90 days)", realProductsTitle: "Real products (eBay)",
     runningSince: "Running since", loadingReal: "Loading real data…",
@@ -111,7 +111,12 @@ function LinkGrid({ links }: { links: ResearchLink[] }) {
   );
 }
 
-function AdLibraryGrid({ entries, tx }: { entries: AdLibraryEntry[]; tx: TrendsText }) {
+function metaAdLibraryUrl(keyword: string): string {
+  return `https://www.facebook.com/ads/library/?active_status=all&ad_type=all&country=ALL&q=${encodeURIComponent(keyword.trim())}&search_type=keyword_unordered`;
+}
+
+function AdLibraryGrid({ entries, tx, keyword }: { entries: AdLibraryEntry[]; tx: TrendsText; keyword: string }) {
+  const verifyUrl = metaAdLibraryUrl(keyword);
   return (
     <div className="mt-4">
       <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
@@ -119,26 +124,33 @@ function AdLibraryGrid({ entries, tx }: { entries: AdLibraryEntry[]; tx: TrendsT
       </h4>
       <div className="mt-2.5 grid gap-2.5 sm:grid-cols-3">
         {entries.map((entry) => (
-          <div key={entry.libraryId} className="rounded-xl border border-ink-200 p-3 text-xs dark:border-ink-700">
+          <a
+            key={entry.libraryId}
+            href={verifyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex flex-col rounded-xl border border-ink-200 p-3 text-xs transition-colors hover:border-brand-400 hover:bg-brand-50/50 dark:border-ink-700 dark:hover:bg-brand-950/20"
+          >
             <div className="flex items-center justify-between text-ink-400">
               <span>ID {entry.libraryId}</span>
               <span className="flex items-center gap-1"><Clock size={11} /> {tx.runningFor} {entry.activeDays} {tx.days}</span>
             </div>
-            <p className="mt-1.5 font-semibold text-ink-900 dark:text-white">{entry.advertiserName}</p>
+            <p className="mt-1.5 flex items-center gap-1 font-semibold text-ink-900 dark:text-white">
+              {entry.advertiserName}
+              <ExternalLink size={11} className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
+            </p>
             <p className="mt-1 line-clamp-3 text-ink-500 dark:text-ink-400">{entry.primaryText}</p>
             <div className="mt-2 rounded-lg bg-ink-50 p-2 dark:bg-ink-800/60">
               <p className="text-[10px] uppercase tracking-wide text-ink-400">{entry.format}</p>
               <p className="mt-0.5 font-medium text-ink-800 dark:text-ink-200">{entry.headline}</p>
             </div>
-            <div className="mt-2 flex items-center justify-between gap-2">
-              <div className="flex flex-wrap gap-1">
-                {entry.platforms.map((p) => (
-                  <span key={p} className="rounded-full bg-ink-100 px-1.5 py-0.5 text-[10px] text-ink-500 dark:bg-ink-800 dark:text-ink-400">{p}</span>
-                ))}
-              </div>
-              <span className="shrink-0 rounded-md bg-ink-900 px-2 py-1 text-[10px] font-semibold text-white dark:bg-white dark:text-ink-950">{entry.cta}</span>
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              {entry.platforms.map((p) => (
+                <span key={p} className="rounded-full bg-ink-100 px-1.5 py-0.5 text-[10px] text-ink-500 dark:bg-ink-800 dark:text-ink-400">{p}</span>
+              ))}
+              <span className="ml-auto shrink-0 rounded-md bg-ink-900 px-2 py-1 text-[10px] font-semibold text-white dark:bg-white dark:text-ink-950">{entry.cta}</span>
             </div>
-          </div>
+          </a>
         ))}
       </div>
       <p className="mt-2 text-xs italic text-ink-400">{tx.adLibraryDisclaimer}</p>
@@ -146,8 +158,9 @@ function AdLibraryGrid({ entries, tx }: { entries: AdLibraryEntry[]; tx: TrendsT
   );
 }
 
-function RealAdsGrid({ ads, tx, lang }: { ads: RealAd[]; tx: TrendsText; lang: Lang }) {
+function RealAdsGrid({ ads, tx, lang, keyword }: { ads: RealAd[]; tx: TrendsText; lang: Lang; keyword: string }) {
   const locale = lang === "en" ? "en-US" : "ru-RU";
+  const verifyUrl = metaAdLibraryUrl(keyword);
   return (
     <div className="mt-4">
       <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
@@ -155,8 +168,17 @@ function RealAdsGrid({ ads, tx, lang }: { ads: RealAd[]; tx: TrendsText; lang: L
       </h4>
       <div className="mt-2.5 grid gap-2.5 sm:grid-cols-3">
         {ads.map((ad, i) => (
-          <div key={i} className="rounded-xl border border-ink-200 p-3 text-xs dark:border-ink-700">
-            <p className="font-semibold text-ink-900 dark:text-white">{ad.pageName}</p>
+          <a
+            key={i}
+            href={ad.snapshotUrl ?? verifyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex flex-col rounded-xl border border-ink-200 p-3 text-xs transition-colors hover:border-brand-400 hover:bg-brand-50/50 dark:border-ink-700 dark:hover:bg-brand-950/20"
+          >
+            <p className="flex items-center gap-1 font-semibold text-ink-900 dark:text-white">
+              {ad.pageName}
+              <ExternalLink size={11} className="shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
+            </p>
             {ad.body && <p className="mt-1 line-clamp-3 text-ink-500 dark:text-ink-400">{ad.body}</p>}
             {ad.platforms.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1">
@@ -166,7 +188,7 @@ function RealAdsGrid({ ads, tx, lang }: { ads: RealAd[]; tx: TrendsText; lang: L
               </div>
             )}
             {ad.startDate && <p className="mt-1.5 text-ink-400">{tx.runningSince} {new Date(ad.startDate).toLocaleDateString(locale)}</p>}
-          </div>
+          </a>
         ))}
       </div>
     </div>
@@ -244,9 +266,9 @@ function MarketDataPanel({ keyword, lang, tx }: { keyword: string; lang: Lang; t
       )}
 
       {data?.ads && data.ads.length > 0 ? (
-        <RealAdsGrid ads={data.ads} tx={tx} lang={lang} />
+        <RealAdsGrid ads={data.ads} tx={tx} lang={lang} keyword={keyword} />
       ) : (
-        <AdLibraryGrid entries={generateAdLibraryEntries(keyword, lang)} tx={tx} />
+        <AdLibraryGrid entries={generateAdLibraryEntries(keyword, lang)} tx={tx} keyword={keyword} />
       )}
 
       {!isMarketDataBackendConfigured() && (

@@ -9,6 +9,7 @@ export interface RealAd {
   body: string | null;
   startDate: string | null;
   platforms: string[];
+  snapshotUrl: string | null;
 }
 
 // Meta's Ad Library API is meant for public transparency, so a basic app
@@ -22,7 +23,7 @@ export async function searchMetaAds(keyword: string, limit = 5): Promise<RealAd[
   url.searchParams.set("search_terms", keyword);
   url.searchParams.set("ad_type", "ALL");
   url.searchParams.set("ad_reached_countries", JSON.stringify(["US"]));
-  url.searchParams.set("fields", "page_name,ad_creative_bodies,ad_delivery_start_time,publisher_platforms");
+  url.searchParams.set("fields", "page_name,ad_creative_bodies,ad_delivery_start_time,publisher_platforms,ad_snapshot_url");
   url.searchParams.set("limit", String(limit));
   url.searchParams.set("access_token", accessToken);
 
@@ -38,6 +39,7 @@ export async function searchMetaAds(keyword: string, limit = 5): Promise<RealAd[
       ad_creative_bodies?: string[];
       ad_delivery_start_time?: string;
       publisher_platforms?: string[];
+      ad_snapshot_url?: string;
     }[];
   }
 
@@ -47,5 +49,6 @@ export async function searchMetaAds(keyword: string, limit = 5): Promise<RealAd[
     body: ad.ad_creative_bodies?.[0] ?? null,
     startDate: ad.ad_delivery_start_time ?? null,
     platforms: ad.publisher_platforms ?? [],
+    snapshotUrl: ad.ad_snapshot_url ?? null,
   }));
 }

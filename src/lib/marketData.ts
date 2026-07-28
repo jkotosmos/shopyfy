@@ -40,6 +40,7 @@ export interface RealAd {
   body: string | null;
   startDate: string | null;
   platforms: string[];
+  snapshotUrl: string | null;
 }
 
 export interface RealMarketData {
