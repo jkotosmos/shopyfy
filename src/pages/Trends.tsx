@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   Search, ExternalLink, BarChart3, Music2, Megaphone, Image as ImageIcon,
-  Video, MessageCircle, ShoppingCart, ShoppingBag, Bookmark, ChevronDown, ChevronUp,
+  Video, MessageCircle, ShoppingCart, ShoppingBag, Bookmark, ChevronDown, ChevronUp, Clock,
 } from "lucide-react";
 import { Badge, Card, Container, Eyebrow, SectionTitle } from "../components/ui";
 import { buildResearchLinks, getTrendingNiches, type ResearchLink, type TrendingNiche } from "../lib/trends";
+import { generateAdLibraryEntries, type AdLibraryEntry } from "../lib/adLibrary";
 import { addSaved } from "../lib/storage";
 import { useLanguage, type Lang } from "../lib/i18n";
 
@@ -26,6 +27,7 @@ const TEXT: Record<Lang, {
   starterEyebrow: string; starterTitle: string; starterSub: string;
   all: string; showSources: string; hideSources: string; saveToWatchlist: string;
   signalLabel: string;
+  adLibraryTitle: string; adLibraryDisclaimer: string; runningFor: string; days: string;
 }> = {
   ru: {
     eyebrow: "Поиск трендов",
@@ -38,6 +40,8 @@ const TEXT: Record<Lang, {
     starterSub: "Баллы и цифры роста ниже — это иллюстративная отправная точка, а не данные в реальном времени: раскройте любую карточку, чтобы перейти к живым источникам и проверить актуальные цифры самостоятельно.",
     all: "Все", showSources: "Показать источники", hideSources: "Скрыть источники", saveToWatchlist: "Сохранить в вотчлист",
     signalLabel: "Сигнал",
+    adLibraryTitle: "Примеры активной рекламы", runningFor: "Активна", days: "дн.",
+    adLibraryDisclaimer: "Иллюстративные примеры в стиле типичных объявлений в этой нише — не реальные объявления. Проверьте, что крутится по-настоящему, по ссылке «Meta Ad Library» выше.",
   },
   en: {
     eyebrow: "Trend Research",
@@ -50,6 +54,8 @@ const TEXT: Record<Lang, {
     starterSub: "The scores and growth figures below are an illustrative starting point, not real-time data — expand any card to jump to live sources and verify current numbers yourself.",
     all: "All", showSources: "Show sources", hideSources: "Hide sources", saveToWatchlist: "Save to watchlist",
     signalLabel: "Signal",
+    adLibraryTitle: "Example ads currently running", runningFor: "Running for", days: "days",
+    adLibraryDisclaimer: "Illustrative examples styled after typical ads in this niche — not real ads. Check what's actually running via the \"Meta Ad Library\" link above.",
   },
 };
 
@@ -82,6 +88,41 @@ function LinkGrid({ links }: { links: ResearchLink[] }) {
   );
 }
 
+function AdLibraryGrid({ entries, tx }: { entries: AdLibraryEntry[]; tx: { adLibraryTitle: string; adLibraryDisclaimer: string; runningFor: string; days: string } }) {
+  return (
+    <div className="mt-4">
+      <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
+        <Megaphone size={13} /> {tx.adLibraryTitle}
+      </h4>
+      <div className="mt-2.5 grid gap-2.5 sm:grid-cols-3">
+        {entries.map((entry) => (
+          <div key={entry.libraryId} className="rounded-xl border border-ink-200 p-3 text-xs dark:border-ink-700">
+            <div className="flex items-center justify-between text-ink-400">
+              <span>ID {entry.libraryId}</span>
+              <span className="flex items-center gap-1"><Clock size={11} /> {tx.runningFor} {entry.activeDays} {tx.days}</span>
+            </div>
+            <p className="mt-1.5 font-semibold text-ink-900 dark:text-white">{entry.advertiserName}</p>
+            <p className="mt-1 line-clamp-3 text-ink-500 dark:text-ink-400">{entry.primaryText}</p>
+            <div className="mt-2 rounded-lg bg-ink-50 p-2 dark:bg-ink-800/60">
+              <p className="text-[10px] uppercase tracking-wide text-ink-400">{entry.format}</p>
+              <p className="mt-0.5 font-medium text-ink-800 dark:text-ink-200">{entry.headline}</p>
+            </div>
+            <div className="mt-2 flex items-center justify-between gap-2">
+              <div className="flex flex-wrap gap-1">
+                {entry.platforms.map((p) => (
+                  <span key={p} className="rounded-full bg-ink-100 px-1.5 py-0.5 text-[10px] text-ink-500 dark:bg-ink-800 dark:text-ink-400">{p}</span>
+                ))}
+              </div>
+              <span className="shrink-0 rounded-md bg-ink-900 px-2 py-1 text-[10px] font-semibold text-white dark:bg-white dark:text-ink-950">{entry.cta}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className="mt-2 text-xs italic text-ink-400">{tx.adLibraryDisclaimer}</p>
+    </div>
+  );
+}
+
 export function Trends() {
   const [params] = useSearchParams();
   const { lang } = useLanguage();
@@ -99,6 +140,7 @@ export function Trends() {
     [niches, category, tx.all],
   );
   const searchLinks = useMemo(() => (searched.trim() ? buildResearchLinks(searched, lang) : []), [searched, lang]);
+  const searchAds = useMemo(() => (searched.trim() ? generateAdLibraryEntries(searched, lang) : []), [searched, lang]);
 
   useEffect(() => {
     setCategory(tx.all);
@@ -149,6 +191,7 @@ export function Trends() {
             <div className="mt-4">
               <LinkGrid links={searchLinks} />
             </div>
+            <AdLibraryGrid entries={searchAds} tx={tx} />
           </Card>
         </Container>
       )}
@@ -217,6 +260,7 @@ export function Trends() {
                 {open && (
                   <div className="mt-4 border-t border-ink-200 pt-4 dark:border-ink-800">
                     <LinkGrid links={buildResearchLinks(n.keyword, lang)} />
+                    <AdLibraryGrid entries={generateAdLibraryEntries(n.keyword, lang)} tx={tx} />
                   </div>
                 )}
               </Card>
