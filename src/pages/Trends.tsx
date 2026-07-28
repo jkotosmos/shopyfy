@@ -122,7 +122,7 @@ function AdLibraryGrid({ entries, tx, keyword }: { entries: AdLibraryEntry[]; tx
       <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
         <Megaphone size={13} /> {tx.adLibraryTitle} <RealBadge label={tx.demoBadge} />
       </h4>
-      <div className="mt-2.5 grid gap-2.5 sm:grid-cols-3">
+      <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
         {entries.map((entry) => (
           <a
             key={entry.libraryId}
@@ -131,9 +131,9 @@ function AdLibraryGrid({ entries, tx, keyword }: { entries: AdLibraryEntry[]; tx
             rel="noopener noreferrer"
             className="group flex flex-col rounded-xl border border-ink-200 p-3 text-xs transition-colors hover:border-brand-400 hover:bg-brand-50/50 dark:border-ink-700 dark:hover:bg-brand-950/20"
           >
-            <div className="flex items-center justify-between text-ink-400">
-              <span>ID {entry.libraryId}</span>
-              <span className="flex items-center gap-1"><Clock size={11} /> {tx.runningFor} {entry.activeDays} {tx.days}</span>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-ink-400">
+              <span className="min-w-0 break-all">ID {entry.libraryId}</span>
+              <span className="ml-auto flex shrink-0 items-center gap-1"><Clock size={11} /> {tx.runningFor} {entry.activeDays} {tx.days}</span>
             </div>
             <p className="mt-1.5 flex items-center gap-1 font-semibold text-ink-900 dark:text-white">
               {entry.advertiserName}
@@ -166,7 +166,7 @@ function RealAdsGrid({ ads, tx, lang, keyword }: { ads: RealAd[]; tx: TrendsText
       <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
         <Megaphone size={13} /> {tx.adLibraryTitle} <RealBadge label={tx.realBadge} />
       </h4>
-      <div className="mt-2.5 grid gap-2.5 sm:grid-cols-3">
+      <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
         {ads.map((ad, i) => (
           <a
             key={i}
