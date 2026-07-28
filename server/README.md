@@ -163,35 +163,62 @@ frontend falls back to its illustrative demo generator for that source
 specifically (never silently blending fabricated numbers into what's
 reported as real).
 
-**Google Trends (via SerpApi).** Google has no publicly-available official
-Trends API — a real one exists but is an invite-only alpha as of 2025. Real
-interest-over-time and interest-by-region data here goes through
-[SerpApi](https://serpapi.com)'s Google Trends endpoint instead: sign up,
-copy your API key into `SERPAPI_KEY`. The free trial covers a small number
-of searches; sustained use needs a paid plan. This is a deliberate choice
-of a documented, ToS-compliant third-party service — swap
-`src/serpapiClient.ts` for a different provider (HasData, Bright Data,
-Apify, etc.) if you'd rather not use SerpApi. The regional breakdown this
-returns is *search interest by country*, not sales data — it's the closest
-legitimate, freely-queryable proxy for "where does this sell" that exists
-without a sales-data API (which nothing public exposes).
+**Two of these three sources are entirely free — no trial limit, no paid
+tier, ever** — and together they're enough for every "real" number the
+Trend Research page shows (a seller-country signal, a real eBay listing
+count, and a real running-ad count): eBay Browse and Meta Ad Library.
+SerpApi (Google Trends) is the one optional paid add-on; skip it and the
+page still shows real, non-illustrative data from the other two.
 
-**eBay Browse API.** Free developer account at
+**eBay Browse API — free.** Free developer account at
 [developer.ebay.com](https://developer.ebay.com) → create an application
 keyset → put the **production** Client ID / Client Secret in `EBAY_APP_ID`
 / `EBAY_CERT_ID` (`src/ebayClient.ts` uses OAuth2 client-credentials to get
-an app access token automatically, no further setup). Real listings — this
-is eBay's marketplace, not AliExpress, since AliExpress has no comparable
-self-serve product-search API for third parties.
+an app access token automatically, no further setup, no cost at any usage
+tier documented by eBay for this). Real listings — this is eBay's
+marketplace, not AliExpress, since AliExpress has no comparable self-serve
+product-search API for third parties. Besides each item's title/price/
+image/URL, the response includes the real total matching-listing count
+(`totalListings`) and each item's real seller/listing country
+(`countryCode`) — the frontend uses the most common country across
+results as a real "where this is sold from" signal, distinct from (and
+usually more available than) Google Trends' search-interest geography.
 
-**Meta Ad Library API.** Create an app at
+**Meta Ad Library API — free.** Create an app at
 [developers.facebook.com](https://developers.facebook.com), put its App ID
 / App Secret in `META_ADS_APP_ID` / `META_ADS_APP_SECRET`
 (`src/metaAdsClient.ts` combines them into an app access token — no
-per-user OAuth flow needed). This covers basic keyword search over
-non-political/non-issue ads. Meta gates higher search volume, and any
-access to political/social-issue ads, behind a separate Ad Library API
-access review — expect friction here that the other two sources don't have.
+per-user OAuth flow needed, no cost). This covers basic keyword search over
+non-political/non-issue ads, reached in the US/UK/Canada/Australia by
+default (`AD_REACHED_COUNTRIES` in `metaAdsClient.ts`). Meta gates higher
+search volume, and any access to political/social-issue ads, behind a
+separate Ad Library API access review — expect friction here that eBay
+doesn't have. Since the API has no total-match-count field, the real
+`activeAdCount` reported is a genuine lower bound (how many ads this one
+query found), with `hasMore: true` when Meta's pagination says there are
+more — used as a real, free proxy for ad-driven demand. There's no
+comparable self-serve public API for TikTok (its ad-transparency and
+research APIs both require a separate approval process, not a quick
+signup), so TikTok stays a real, direct search link on the page rather
+than an automated number.
+
+**Google Trends (via SerpApi) — optional, not free at scale.** Google has
+no publicly-available official Trends API — a real one exists but is an
+invite-only alpha as of 2025. Real interest-over-time and interest-by-
+region data here goes through [SerpApi](https://serpapi.com)'s Google
+Trends endpoint instead: sign up, copy your API key into `SERPAPI_KEY`.
+The free trial covers a small number of searches; sustained use needs a
+paid plan. The unofficial alternative — querying Google's own undocumented
+internal Trends endpoint directly, the way tools like pytrends do — costs
+nothing per request, but isn't a dependable substitute: it's against
+Google's terms of service for automated access, commonly rate-limited or
+blocked by IP (including most cloud-provider ranges), and could break
+without notice since it's not a documented, versioned API. SerpApi is a
+deliberate trade of a small ongoing cost for something that won't quietly
+stop working; swap `src/serpapiClient.ts` for a different documented
+provider (HasData, Bright Data, Apify, etc.) if you'd rather pay someone
+else for the same reliability. The regional breakdown this returns is
+*search interest by country*, not sales data.
 
 ## 7. Before this touches a real, non-test store
 

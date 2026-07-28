@@ -33,6 +33,12 @@ export interface RealProduct {
   image: string | null;
   condition: string | null;
   seller: string | null;
+  countryCode: string | null;
+}
+
+export interface RealProducts {
+  items: RealProduct[];
+  totalListings: number;
 }
 
 export interface RealAd {
@@ -43,11 +49,17 @@ export interface RealAd {
   snapshotUrl: string | null;
 }
 
+export interface RealAdsData {
+  ads: RealAd[];
+  activeAdCount: number;
+  hasMore: boolean;
+}
+
 export interface RealMarketData {
   query: string;
   trends: RealGoogleTrends | null;
-  products: RealProduct[] | null;
-  ads: RealAd[] | null;
+  products: RealProducts | null;
+  ads: RealAdsData | null;
   sources: { trends: boolean; products: boolean; ads: boolean };
 }
 

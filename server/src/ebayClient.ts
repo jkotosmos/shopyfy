@@ -12,6 +12,12 @@ export interface EbayItem {
   image: string | null;
   condition: string | null;
   seller: string | null;
+  countryCode: string | null; // real listing/seller country (ISO 2-letter) from eBay itself
+}
+
+export interface EbaySearchResult {
+  items: EbayItem[];
+  totalListings: number; // eBay's own real total match count, not just this page's size
 }
 
 let cachedToken: { token: string; expiresAt: number } | null = null;
@@ -42,7 +48,7 @@ async function getEbayAppToken(): Promise<string> {
   return cachedToken.token;
 }
 
-export async function searchEbayItems(keyword: string, limit = 8): Promise<EbayItem[]> {
+export async function searchEbayItems(keyword: string, limit = 8): Promise<EbaySearchResult> {
   const token = await getEbayAppToken();
   const url = new URL("https://api.ebay.com/buy/browse/v1/item_summary/search");
   url.searchParams.set("q", keyword);
@@ -62,6 +68,7 @@ export async function searchEbayItems(keyword: string, limit = 8): Promise<EbayI
   }
 
   interface EbaySearchResponse {
+    total?: number;
     itemSummaries?: {
       title: string;
       price?: { value: string; currency: string };
@@ -69,11 +76,12 @@ export async function searchEbayItems(keyword: string, limit = 8): Promise<EbayI
       image?: { imageUrl: string };
       condition?: string;
       seller?: { username: string };
+      itemLocation?: { country?: string };
     }[];
   }
 
   const data = (await res.json()) as EbaySearchResponse;
-  return (data.itemSummaries ?? []).map((item) => ({
+  const items = (data.itemSummaries ?? []).map((item) => ({
     title: item.title,
     price: item.price ? Number(item.price.value) : null,
     currency: item.price?.currency ?? null,
@@ -81,5 +89,7 @@ export async function searchEbayItems(keyword: string, limit = 8): Promise<EbayI
     image: item.image?.imageUrl ?? null,
     condition: item.condition ?? null,
     seller: item.seller?.username ?? null,
+    countryCode: item.itemLocation?.country ?? null,
   }));
+  return { items, totalListings: data.total ?? items.length };
 }

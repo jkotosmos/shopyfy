@@ -5,9 +5,9 @@ import {
   Video, MessageCircle, ShoppingCart, ShoppingBag, Bookmark, ChevronDown, ChevronUp, Clock, Loader2, Info,
 } from "lucide-react";
 import { Badge, Card, Container, Eyebrow, SectionTitle } from "../components/ui";
-import { buildResearchLinks, getTrendingNiches, estimateTopCountry, type ResearchLink, type TrendingNiche, type TopCountry } from "../lib/trends";
+import { buildResearchLinks, getTrendingNiches, estimateTopCountry, countryNameFromCode, type ResearchLink, type TrendingNiche, type TopCountry } from "../lib/trends";
 import { generateAdLibraryEntries, type AdLibraryEntry } from "../lib/adLibrary";
-import { fetchRealMarketData, isMarketDataBackendConfigured, type RealMarketData, type RealAd } from "../lib/marketData";
+import { fetchRealMarketData, isMarketDataBackendConfigured, type RealMarketData, type RealAd, type RealProduct } from "../lib/marketData";
 import { addSaved } from "../lib/storage";
 import { useLanguage, type Lang } from "../lib/i18n";
 
@@ -29,8 +29,9 @@ interface TrendsText {
   all: string; showSources: string; hideSources: string; saveToWatchlist: string;
   signalLabel: string;
   adLibraryTitle: string; adLibraryDisclaimer: string; runningFor: string; days: string;
-  realBadge: string; demoBadge: string; topCountryLabel: string; estimateLabel: string;
+  realBadge: string; demoBadge: string; topCountryLabel: string; sellerCountryLabel: string; estimateLabel: string;
   realInterestLabel: string; realProductsTitle: string; runningSince: string; loadingReal: string;
+  realListingsLabel: string; realAdCountLabel: string; productCountryHint: string;
   notConfiguredHint: string;
 }
 
@@ -48,10 +49,12 @@ const TEXT: Record<Lang, TrendsText> = {
     signalLabel: "Сигнал",
     adLibraryTitle: "Примеры активной рекламы", runningFor: "Активна", days: "дн.",
     adLibraryDisclaimer: "Иллюстративные примеры в стиле типичных объявлений в этой нише — не реальные объявления. Нажмите на карточку, чтобы открыть настоящий поиск по Meta Ad Library и увидеть, что крутится на самом деле.",
-    realBadge: "Реально", demoBadge: "Демо", topCountryLabel: "Чаще всего ищут в", estimateLabel: "оценка",
+    realBadge: "Реально", demoBadge: "Демо", topCountryLabel: "Чаще всего ищут в", sellerCountryLabel: "Продавцы чаще всего из", estimateLabel: "оценка",
     realInterestLabel: "реальный интерес в поиске (Google Trends, 90 дней)", realProductsTitle: "Реальные товары (eBay)",
     runningSince: "Показывается с", loadingReal: "Загружаем реальные данные…",
-    notConfiguredHint: "Чтобы видеть здесь реальные данные (Google Trends, eBay, Meta Ad Library) вместо иллюстративных примеров, разверните бэкенд из server/ и настройте SERPAPI_KEY / EBAY_APP_ID / META_ADS_APP_ID — см. server/README.md.",
+    realListingsLabel: "реальных объявлений найдено на eBay", realAdCountLabel: "активных объявлений в Meta Ad Library прямо сейчас (США/Великобритания/Канада/Австралия)",
+    productCountryHint: "Продавец из",
+    notConfiguredHint: "Чтобы видеть здесь реальные данные вместо иллюстративных примеров, разверните бэкенд из server/ и настройте бесплатные EBAY_APP_ID/EBAY_CERT_ID и META_ADS_APP_ID/META_ADS_APP_SECRET (оба без какой-либо оплаты) — см. server/README.md. SERPAPI_KEY для Google Trends не обязателен и не бесплатен после небольшого пробного лимита.",
   },
   en: {
     eyebrow: "Trend Research",
@@ -66,10 +69,12 @@ const TEXT: Record<Lang, TrendsText> = {
     signalLabel: "Signal",
     adLibraryTitle: "Example ads currently running", runningFor: "Running for", days: "days",
     adLibraryDisclaimer: "Illustrative examples styled after typical ads in this niche — not real ads. Click a card to open a real Meta Ad Library search and see what's actually running.",
-    realBadge: "Real", demoBadge: "Demo", topCountryLabel: "Most searched in", estimateLabel: "estimate",
+    realBadge: "Real", demoBadge: "Demo", topCountryLabel: "Most searched in", sellerCountryLabel: "Sellers most often based in", estimateLabel: "estimate",
     realInterestLabel: "real search interest (Google Trends, 90 days)", realProductsTitle: "Real products (eBay)",
     runningSince: "Running since", loadingReal: "Loading real data…",
-    notConfiguredHint: "To see real data here (Google Trends, eBay, Meta Ad Library) instead of illustrative examples, deploy the backend in server/ and configure SERPAPI_KEY / EBAY_APP_ID / META_ADS_APP_ID — see server/README.md.",
+    realListingsLabel: "real listings found on eBay", realAdCountLabel: "active ads in Meta Ad Library right now (US/UK/CA/AU)",
+    productCountryHint: "Seller based in",
+    notConfiguredHint: "To see real data here instead of illustrative examples, deploy the backend in server/ and configure the free EBAY_APP_ID/EBAY_CERT_ID and META_ADS_APP_ID/META_ADS_APP_SECRET (both cost nothing) — see server/README.md. SERPAPI_KEY for Google Trends is optional and isn't free beyond a small trial quota.",
   },
 };
 
@@ -80,6 +85,25 @@ function RealBadge({ label }: { label: string }) {
 function countryCodeToFlag(code: string): string {
   if (!/^[A-Za-z]{2}$/.test(code)) return "🌍";
   return code.toUpperCase().replace(/./g, (c) => String.fromCodePoint(127397 + c.charCodeAt(0)));
+}
+
+// Real signal, free of charge: the most common seller/listing country
+// among actual eBay search results for this keyword.
+function mostCommonCountryCode(products: RealProduct[]): string | null {
+  const counts = new Map<string, number>();
+  for (const p of products) {
+    if (!p.countryCode) continue;
+    counts.set(p.countryCode, (counts.get(p.countryCode) ?? 0) + 1);
+  }
+  let best: string | null = null;
+  let bestCount = 0;
+  for (const [code, count] of counts) {
+    if (count > bestCount) {
+      best = code;
+      bestCount = count;
+    }
+  }
+  return best;
 }
 
 function LinkGrid({ links }: { links: ResearchLink[] }) {
@@ -214,18 +238,27 @@ function MarketDataPanel({ keyword, lang, tx }: { keyword: string; lang: Lang; t
     };
   }, [keyword]);
 
-  const realCountry = data?.trends?.topCountries?.[0];
-  const topCountry: TopCountry = realCountry
-    ? { flag: countryCodeToFlag(realCountry.countryCode), name: realCountry.country, real: true }
+  const locale = lang === "en" ? "en-US" : "ru-RU";
+
+  // Prefer the eBay-derived real seller country (free, no paid keys) over
+  // Google Trends' real search-interest country (needs paid SerpApi),
+  // falling back to an illustrative estimate when neither is available.
+  const ebayCountryCode = data?.products ? mostCommonCountryCode(data.products.items) : null;
+  const realTrendsCountry = data?.trends?.topCountries?.[0];
+  const topCountry: TopCountry = ebayCountryCode
+    ? { flag: countryCodeToFlag(ebayCountryCode), name: countryNameFromCode(ebayCountryCode, lang), source: "ebay" }
+    : realTrendsCountry
+    ? { flag: countryCodeToFlag(realTrendsCountry.countryCode), name: realTrendsCountry.country, source: "trends" }
     : estimateTopCountry(keyword, lang);
+  const countryLabel = topCountry.source === "ebay" ? tx.sellerCountryLabel : tx.topCountryLabel;
 
   return (
     <div className="mt-4 border-t border-ink-200 pt-4 dark:border-ink-800">
       <LinkGrid links={buildResearchLinks(keyword, lang)} />
 
       <p className="mt-3 flex items-center gap-1.5 text-sm text-ink-600 dark:text-ink-300">
-        <span>{topCountry.flag}</span> {tx.topCountryLabel}: <strong className="text-ink-900 dark:text-white">{topCountry.name}</strong>
-        {topCountry.real ? <RealBadge label={tx.realBadge} /> : <span className="text-xs text-ink-400">({tx.estimateLabel})</span>}
+        <span>{topCountry.flag}</span> {countryLabel}: <strong className="text-ink-900 dark:text-white">{topCountry.name}</strong>
+        {topCountry.source !== "estimate" ? <RealBadge label={tx.realBadge} /> : <span className="text-xs text-ink-400">({tx.estimateLabel})</span>}
       </p>
 
       {loading && (
@@ -238,13 +271,25 @@ function MarketDataPanel({ keyword, lang, tx }: { keyword: string; lang: Lang; t
         </p>
       )}
 
-      {data?.products && data.products.length > 0 && (
+      {data?.products && (
+        <p className="mt-2 text-xs text-ink-500 dark:text-ink-400">
+          <strong className="text-ink-900 dark:text-white">{data.products.totalListings.toLocaleString(locale)}</strong> {tx.realListingsLabel} <RealBadge label={tx.realBadge} />
+        </p>
+      )}
+
+      {data?.ads && (
+        <p className="mt-2 text-xs text-ink-500 dark:text-ink-400">
+          <strong className="text-ink-900 dark:text-white">{data.ads.activeAdCount}{data.ads.hasMore ? "+" : ""}</strong> {tx.realAdCountLabel} <RealBadge label={tx.realBadge} />
+        </p>
+      )}
+
+      {data?.products && data.products.items.length > 0 && (
         <div className="mt-4">
           <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
             <ShoppingBag size={13} /> {tx.realProductsTitle} <RealBadge label={tx.realBadge} />
           </h4>
           <div className="mt-2.5 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-            {data.products.slice(0, 4).map((p) => (
+            {data.products.items.slice(0, 4).map((p) => (
               <a
                 key={p.url}
                 href={p.url}
@@ -259,14 +304,17 @@ function MarketDataPanel({ keyword, lang, tx }: { keyword: string; lang: Lang; t
                     {p.currency === "USD" ? "$" : `${p.currency ?? ""} `}{p.price.toFixed(2)}
                   </p>
                 )}
+                {p.countryCode && (
+                  <p className="mt-1 text-[10px] text-ink-400">{tx.productCountryHint} {countryCodeToFlag(p.countryCode)} {p.countryCode}</p>
+                )}
               </a>
             ))}
           </div>
         </div>
       )}
 
-      {data?.ads && data.ads.length > 0 ? (
-        <RealAdsGrid ads={data.ads} tx={tx} lang={lang} keyword={keyword} />
+      {data?.ads && data.ads.ads.length > 0 ? (
+        <RealAdsGrid ads={data.ads.ads} tx={tx} lang={lang} keyword={keyword} />
       ) : (
         <AdLibraryGrid entries={generateAdLibraryEntries(keyword, lang)} tx={tx} keyword={keyword} />
       )}

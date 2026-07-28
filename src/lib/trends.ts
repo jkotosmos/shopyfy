@@ -19,17 +19,64 @@ export interface ResearchLink {
 export interface TopCountry {
   flag: string;
   name: string;
-  real: boolean; // true = from real Google Trends regional data, false = illustrative guess
+  // "ebay" = real seller/listing location from actual eBay results (free,
+  // no paid keys needed); "trends" = real Google Trends regional search
+  // interest (needs a paid SerpApi key); "estimate" = illustrative guess.
+  // Kept distinct rather than a single real/fake flag because eBay and
+  // Trends measure different things (who sells it vs. who searches for
+  // it) — collapsing them into one generic "real" claim would blur what's
+  // actually being measured.
+  source: "ebay" | "trends" | "estimate";
+}
+
+// ISO 3166-1 alpha-2 -> localized name, for turning a real country code
+// (from eBay's itemLocation or Google Trends' region data) into a
+// displayable name. Covers eBay's most common seller/marketplace countries.
+const ISO_COUNTRY_NAMES: Record<string, Record<Lang, string>> = {
+  US: { ru: "США", en: "United States" },
+  GB: { ru: "Великобритания", en: "United Kingdom" },
+  CA: { ru: "Канада", en: "Canada" },
+  AU: { ru: "Австралия", en: "Australia" },
+  DE: { ru: "Германия", en: "Germany" },
+  FR: { ru: "Франция", en: "France" },
+  IT: { ru: "Италия", en: "Italy" },
+  ES: { ru: "Испания", en: "Spain" },
+  NL: { ru: "Нидерланды", en: "Netherlands" },
+  PL: { ru: "Польша", en: "Poland" },
+  CN: { ru: "Китай", en: "China" },
+  HK: { ru: "Гонконг", en: "Hong Kong" },
+  JP: { ru: "Япония", en: "Japan" },
+  KR: { ru: "Южная Корея", en: "South Korea" },
+  IN: { ru: "Индия", en: "India" },
+  MX: { ru: "Мексика", en: "Mexico" },
+  BR: { ru: "Бразилия", en: "Brazil" },
+  AE: { ru: "ОАЭ", en: "UAE" },
+  TR: { ru: "Турция", en: "Turkey" },
+  SG: { ru: "Сингапур", en: "Singapore" },
+  TW: { ru: "Тайвань", en: "Taiwan" },
+  VN: { ru: "Вьетнам", en: "Vietnam" },
+  TH: { ru: "Таиланд", en: "Thailand" },
+  IE: { ru: "Ирландия", en: "Ireland" },
+  CH: { ru: "Швейцария", en: "Switzerland" },
+  BE: { ru: "Бельгия", en: "Belgium" },
+  AT: { ru: "Австрия", en: "Austria" },
+  SE: { ru: "Швеция", en: "Sweden" },
+  CZ: { ru: "Чехия", en: "Czechia" },
+};
+
+export function countryNameFromCode(code: string, lang: Lang): string {
+  return ISO_COUNTRY_NAMES[code.toUpperCase()]?.[lang] ?? code.toUpperCase();
 }
 
 // Best-effort "where is this bought/searched most" — used as a fallback
-// whenever real regional interest data isn't available (no backend, or
-// SerpApi not configured). Deterministic per keyword, clearly marked
-// `real: false` so the UI can label it as an estimate, not a fact.
+// whenever no real, freely-obtained country signal is available (no
+// backend, or neither eBay nor SerpApi configured). Deterministic per
+// keyword, clearly marked `source: "estimate"` so the UI can label it as
+// a guess, not a fact.
 export function estimateTopCountry(keyword: string, lang: Lang): TopCountry {
   const rng = makeRng(`${keyword}|topcountry`);
   const c = pick(rng, countries(lang));
-  return { flag: c.flag, name: c.name, real: false };
+  return { flag: c.flag, name: c.name, source: "estimate" };
 }
 
 const LINK_TEXT: Record<Lang, { label: string; platform: string; hint: string }[]> = {

@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { isSerpApiConfigured, fetchGoogleTrends, type GoogleTrendsResult } from "../serpapiClient.js";
-import { isEbayConfigured, searchEbayItems, type EbayItem } from "../ebayClient.js";
-import { isMetaAdsConfigured, searchMetaAds, type RealAd } from "../metaAdsClient.js";
+import { isEbayConfigured, searchEbayItems, type EbaySearchResult } from "../ebayClient.js";
+import { isMetaAdsConfigured, searchMetaAds, type MetaAdsResult } from "../metaAdsClient.js";
 
 async function settle<T>(enabled: boolean, fn: () => Promise<T>): Promise<T | null> {
   if (!enabled) return null;
@@ -27,8 +27,8 @@ export async function getMarketData(req: Request, res: Response) {
 
   const [trends, products, ads] = await Promise.all([
     settle<GoogleTrendsResult>(isSerpApiConfigured(), () => fetchGoogleTrends(q)),
-    settle<EbayItem[]>(isEbayConfigured(), () => searchEbayItems(q)),
-    settle<RealAd[]>(isMetaAdsConfigured(), () => searchMetaAds(q)),
+    settle<EbaySearchResult>(isEbayConfigured(), () => searchEbayItems(q)),
+    settle<MetaAdsResult>(isMetaAdsConfigured(), () => searchMetaAds(q)),
   ]);
 
   res.json({
