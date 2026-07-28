@@ -33,6 +33,7 @@ function LanguageToggle({ className = "" }: { className?: string }) {
 }
 
 const NAV: { to: string; key: string }[] = [
+  { to: "/launch-plan", key: "nav.launchPlan" },
   { to: "/store-builder", key: "nav.storeBuilder" },
   { to: "/trends", key: "nav.trends" },
   { to: "/tools/site-analyzer", key: "nav.siteAnalyzer" },

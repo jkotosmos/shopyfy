@@ -5,6 +5,7 @@ import { useLanguage, type Lang } from "../lib/i18n";
 const FOOTER_LINKS: Record<Lang, { create: { label: string; to: string }[]; research: { label: string; to: string }[]; company: { label: string; to: string }[] }> = {
   ru: {
     create: [
+      { label: "План запуска", to: "/launch-plan" },
       { label: "AI-конструктор магазина", to: "/store-builder" },
       { label: "Тарифы", to: "/#pricing" },
       { label: "Активировать промокод", to: "/redeem" },
@@ -14,6 +15,7 @@ const FOOTER_LINKS: Record<Lang, { create: { label: string; to: string }[]; rese
       { label: "Поиск трендов", to: "/trends" },
       { label: "SEO-анализ сайта", to: "/tools/site-analyzer" },
       { label: "Калькулятор маржи", to: "/tools/profit-calculator" },
+      { label: "Калькулятор тестового бюджета", to: "/tools/ad-budget" },
       { label: "Генератор текстов для рекламы", to: "/tools/ad-copy" },
       { label: "Сценарии для видео-рекламы", to: "/tools/video-script" },
       { label: "Генератор политик магазина", to: "/tools/policy-generator" },
@@ -26,6 +28,7 @@ const FOOTER_LINKS: Record<Lang, { create: { label: string; to: string }[]; rese
   },
   en: {
     create: [
+      { label: "Launch Plan", to: "/launch-plan" },
       { label: "AI Store Builder", to: "/store-builder" },
       { label: "Pricing", to: "/#pricing" },
       { label: "Activate promo code", to: "/redeem" },
@@ -35,6 +38,7 @@ const FOOTER_LINKS: Record<Lang, { create: { label: string; to: string }[]; rese
       { label: "Trend Research", to: "/trends" },
       { label: "Site SEO Analyzer", to: "/tools/site-analyzer" },
       { label: "Margin Calculator", to: "/tools/profit-calculator" },
+      { label: "Ad Test Budget Calculator", to: "/tools/ad-budget" },
       { label: "Ad Copy Generator", to: "/tools/ad-copy" },
       { label: "Video Ad Script Generator", to: "/tools/video-script" },
       { label: "Store Policy Generator", to: "/tools/policy-generator" },

@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import {
   ArrowRight, Wand2, LayoutTemplate, FileText, PackagePlus, ShoppingCart, UploadCloud,
   Clock, DollarSign, TrendingUp, Calculator, MessageSquareText, Bookmark, Search,
-  ChevronDown, Check, Link2, BrainCircuit, Sparkles, Loader2, KeyRound, Clapperboard, Scale,
+  ChevronDown, Check, Link2, BrainCircuit, Sparkles, Loader2, KeyRound, Clapperboard, Scale, Wallet, ListChecks,
 } from "lucide-react";
 import { Badge, Button, Card, Container, Eyebrow, LinkButton, Modal, SectionTitle, Stat } from "../components/ui";
 import { useLanguage, type Lang } from "../lib/i18n";
@@ -49,6 +49,7 @@ const EXTRA_TOOLS: Record<Lang, { icon: typeof TrendingUp; title: string; body: 
     { icon: TrendingUp, title: "Поиск трендовых товаров", body: "Подборка трендовых ниш плюс универсальный поиск по ключевому слову — каждое утверждение ведёт на Google Trends, TikTok, Meta Ad Library, Pinterest и другие источники, чтобы вы могли всё проверить сами.", to: "/trends", cta: "Смотреть тренды" },
     { icon: Search, title: "SEO-анализ сайта конкурента", body: "Отчёт в духе премиум-версии SimilarWeb: источники трафика, гео, органические и платные ключевые слова, бэклинки, соцсети, похожие сайты и технологии — по любому домену.", to: "/tools/site-analyzer", cta: "Проанализировать сайт" },
     { icon: Calculator, title: "Калькулятор маржи", body: "Учитывает себестоимость у поставщика, доставку, комиссию платёжки и расходы на рекламу, чтобы показать реальную маржу — или цену, нужную для целевой маржи.", to: "/tools/profit-calculator", cta: "Посчитать" },
+    { icon: Wallet, title: "Калькулятор тестового бюджета рекламы", body: "Точка безубыточности, рекомендованный бюджет теста и чёткий вердикт «убить или масштабировать» на основе фактических расходов и продаж.", to: "/tools/ad-budget", cta: "Рассчитать бюджет" },
     { icon: MessageSquareText, title: "Генератор рекламных текстов", body: "Пять рекламных ракурсов (любопытство, срочность, соцдоказательство, до/после…) плюс готовые хэштеги для TikTok и Instagram.", to: "/tools/ad-copy", cta: "Сгенерировать текст" },
     { icon: Clapperboard, title: "Сценарии для видео-рекламы", body: "Готовые UGC-сценарии для TikTok/Reels: хук, покадровая раскадровка с текстом на экране и озвучкой, призыв к действию — снимай на телефон.", to: "/tools/video-script", cta: "Сгенерировать сценарий" },
     { icon: Scale, title: "Генератор политик магазина", body: "Черновики Политики конфиденциальности, Условий использования и Политики возврата под ваш магазин — с пометкой, что это не юридическая консультация.", to: "/tools/policy-generator", cta: "Сгенерировать политики" },
@@ -58,6 +59,7 @@ const EXTRA_TOOLS: Record<Lang, { icon: typeof TrendingUp; title: string; body: 
     { icon: TrendingUp, title: "Trending product research", body: "A curated list of trending niches plus a universal keyword search — every claim links out to Google Trends, TikTok, Meta Ad Library, Pinterest, and more so you can verify it yourself.", to: "/trends", cta: "See trends" },
     { icon: Search, title: "Competitor site SEO analysis", body: "A report in the spirit of premium SimilarWeb: traffic sources, geography, organic and paid keywords, backlinks, social traffic, similar sites, and tech stack — for any domain.", to: "/tools/site-analyzer", cta: "Analyze a site" },
     { icon: Calculator, title: "Margin calculator", body: "Factors in supplier cost, shipping, payment fees, and ad spend to show real margin — or the price you'd need for a target margin.", to: "/tools/profit-calculator", cta: "Calculate" },
+    { icon: Wallet, title: "Ad test budget calculator", body: "Break-even cost per sale, a recommended test budget, and a clear kill-or-scale verdict based on your actual spend and sales.", to: "/tools/ad-budget", cta: "Calculate budget" },
     { icon: MessageSquareText, title: "Ad copy generator", body: "Five ad angles (curiosity, urgency, social proof, before/after…) plus ready-made hashtags for TikTok and Instagram.", to: "/tools/ad-copy", cta: "Generate copy" },
     { icon: Clapperboard, title: "Video ad script generator", body: "Ready-made UGC scripts for TikTok/Reels: hook, shot-by-shot breakdown with on-screen text and voiceover, and a closing CTA — filmable on a phone.", to: "/tools/video-script", cta: "Generate a script" },
     { icon: Scale, title: "Store policy generator", body: "Draft Privacy Policy, Terms of Service, and Refund Policy for your store — clearly labeled as a starting point, not legal advice.", to: "/tools/policy-generator", cta: "Generate policies" },
@@ -117,6 +119,7 @@ const HOME_TEXT: Record<Lang, {
   howEyebrow: string; howTitle: string; stepLabel: string;
   featuresEyebrow: string; featuresTitle: string; featuresSub: string;
   toolsEyebrow: string; toolsTitle: string; toolsSub: string;
+  launchPlanBannerTitle: string; launchPlanBannerBody: string; launchPlanBannerCta: string;
   benefitsEyebrow: string; benefitsTitle: string;
   benefitTimeTitle: string; benefitTimeBody: string;
   benefitConvTitle: string; benefitConvBody: string;
@@ -141,6 +144,8 @@ const HOME_TEXT: Record<Lang, {
     howEyebrow: "Как это работает", howTitle: "От ссылки до готового магазина за четыре шага", stepLabel: "ШАГ",
     featuresEyebrow: "Основные функции", featuresTitle: "Всё в одном приложении вместо пяти", featuresSub: "Тема, конструктор страниц и приложения для допродаж — заменены единым ИИ-процессом.",
     toolsEyebrow: "Не только конструктор магазина", toolsTitle: "Встроенное исследование рынка для дропшипперов", toolsSub: "Найдите, что в тренде, правильно посчитайте цену и напишите рекламу — ещё до того, как потратите хоть доллар.",
+    launchPlanBannerTitle: "Не знаете, с чего начать?", launchPlanBannerBody: "Пошаговый план запуска магазина: от поиска товара до масштабирования рекламы, с прогрессом и ссылками на все инструменты.",
+    launchPlanBannerCta: "Открыть план запуска",
     benefitsEyebrow: "Почему это того стоит", benefitsTitle: "Время, деньги и конверсия — всё сразу",
     benefitTimeTitle: "Экономия времени", benefitTimeBody: "Создавайте страницы товаров до 15× быстрее и экономьте 40+ часов по сравнению с ручной сборкой магазина.",
     benefitConvTitle: "Рост конверсии", benefitConvBody: "Секции и текстовые паттерны, основанные на том, что работает у успешных e-commerce брендов.",
@@ -168,6 +173,8 @@ const HOME_TEXT: Record<Lang, {
     howEyebrow: "How it works", howTitle: "From link to finished store in four steps", stepLabel: "STEP",
     featuresEyebrow: "Core features", featuresTitle: "One app instead of five", featuresSub: "Theme, page builder, and upsell apps — replaced by a single AI process.",
     toolsEyebrow: "More than a store builder", toolsTitle: "Built-in market research for dropshippers", toolsSub: "Find what's trending, price it right, and write the ads — before you spend a single dollar.",
+    launchPlanBannerTitle: "Not sure where to start?", launchPlanBannerBody: "A step-by-step launch plan: from product research to scaling ads, with progress tracking and links to every tool.",
+    launchPlanBannerCta: "Open the launch plan",
     benefitsEyebrow: "Why it's worth it", benefitsTitle: "Time, money, and conversion — all at once",
     benefitTimeTitle: "Save time", benefitTimeBody: "Build product pages up to 15× faster and save 40+ hours versus building a store by hand.",
     benefitConvTitle: "Higher conversion", benefitConvBody: "Sections and copy patterns based on what works for successful e-commerce brands.",
@@ -289,7 +296,23 @@ export function Home() {
             <SectionTitle>{tx.toolsTitle}</SectionTitle>
             <p className="mt-3 text-ink-500 dark:text-ink-400">{tx.toolsSub}</p>
           </div>
-          <div className="mt-14 grid gap-5 sm:grid-cols-2">
+
+          <Link to="/launch-plan" className="mt-10 flex flex-col items-start gap-4 rounded-2xl border border-brand-300 bg-brand-50 p-6 transition-colors hover:border-brand-400 dark:border-brand-800 dark:bg-brand-950/30 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4 sm:items-center">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white">
+                <ListChecks size={20} />
+              </div>
+              <div>
+                <h3 className="font-semibold text-ink-950 dark:text-white">{tx.launchPlanBannerTitle}</h3>
+                <p className="mt-1 text-sm text-ink-600 dark:text-ink-300">{tx.launchPlanBannerBody}</p>
+              </div>
+            </div>
+            <span className="flex shrink-0 items-center gap-1.5 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white">
+              {tx.launchPlanBannerCta} <ArrowRight size={14} />
+            </span>
+          </Link>
+
+          <div className="mt-8 grid gap-5 sm:grid-cols-2">
             {EXTRA_TOOLS[lang].map((item) => (
               <Card key={item.title} className="flex flex-col">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-500 text-white">

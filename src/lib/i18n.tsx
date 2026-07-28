@@ -82,6 +82,7 @@ export function useLanguage(): LanguageContextValue {
 // strings individually here would be harder to maintain than to read.
 export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
   ru: {
+    "nav.launchPlan": "План запуска",
     "nav.storeBuilder": "Конструктор магазина",
     "nav.trends": "Поиск трендов",
     "nav.siteAnalyzer": "SEO-анализ сайта",
@@ -105,6 +106,7 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     "lang.toggleLabel": "Язык",
   },
   en: {
+    "nav.launchPlan": "Launch Plan",
     "nav.storeBuilder": "Store Builder",
     "nav.trends": "Trend Research",
     "nav.siteAnalyzer": "Site SEO Analyzer",
