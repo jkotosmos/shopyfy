@@ -84,7 +84,7 @@ export function Redeem() {
             <form onSubmit={handleSubmit}>
               <label className="block">
                 <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{tx.codeLabel}</span>
-                <div className="mt-1.5 flex items-center rounded-xl border border-ink-200 bg-white px-3 dark:border-ink-700 dark:bg-ink-900">
+                <div className="mt-1.5 flex items-center rounded-xl border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 dark:border-ink-700 dark:bg-ink-900">
                   <KeyRound size={15} className="text-ink-400" />
                   <input
                     value={code}

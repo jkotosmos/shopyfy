@@ -82,7 +82,7 @@ export function AdCopy() {
               <input
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white"
+                className="mt-1.5 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white"
               />
             </label>
             <label className="block sm:col-span-1">
@@ -94,7 +94,7 @@ export function AdCopy() {
                   const n = NICHES.find((x) => x.id === e.target.value);
                   if (n) setBenefit(nicheBenefit(n, lang));
                 }}
-                className="mt-1.5 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white"
+                className="mt-1.5 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white"
               >
                 {NICHES.map((n) => <option key={n.id} value={n.id}>{n.emoji} {nicheLabel(n, lang)}</option>)}
               </select>
@@ -104,7 +104,7 @@ export function AdCopy() {
               <input
                 value={benefit}
                 onChange={(e) => setBenefit(e.target.value)}
-                className="mt-1.5 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white"
+                className="mt-1.5 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white"
               />
             </label>
             <div className="sm:col-span-3">

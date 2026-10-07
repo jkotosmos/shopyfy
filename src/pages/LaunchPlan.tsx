@@ -134,7 +134,7 @@ export function LaunchPlan() {
                 type="button"
                 onClick={() => toggle(s.id)}
                 className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                  isDone ? "border-brand-500 bg-brand-500 text-white" : "border-ink-300 text-transparent hover:border-brand-400 dark:border-ink-600"
+                  isDone ? "border-ink-950 bg-brand-400 text-ink-950" : "border-ink-300 text-transparent hover:border-brand-400 dark:border-ink-600"
                 }`}
                 aria-label="toggle"
               >

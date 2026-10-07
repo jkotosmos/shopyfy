@@ -40,7 +40,7 @@ function NumberField({ label, value, onChange, prefix, suffix, step = 0.1 }: {
   return (
     <label className="block">
       <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{label}</span>
-      <div className="mt-1.5 flex items-center rounded-xl border border-ink-200 bg-white px-3 dark:border-ink-700 dark:bg-ink-900">
+      <div className="mt-1.5 flex items-center rounded-xl border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 dark:border-ink-700 dark:bg-ink-900">
         {prefix && <span className="text-sm text-ink-400">{prefix}</span>}
         <input
           type="number"
@@ -110,7 +110,7 @@ export function ProfitCalculator() {
               <div className="flex items-center justify-between gap-3">
                 <div className="flex-1">
                   <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{tx.targetMargin}</span>
-                  <div className="mt-1.5 flex items-center rounded-lg border border-ink-200 bg-white px-2 dark:border-ink-700 dark:bg-ink-900">
+                  <div className="mt-1.5 flex items-center rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-2 dark:border-ink-700 dark:bg-ink-900">
                     <input type="number" value={targetMargin} onChange={(e) => setTargetMargin(parseFloat(e.target.value) || 0)} className="w-full bg-transparent px-2 py-2 text-sm outline-none dark:text-white" />
                     <span className="text-sm text-ink-400">%</span>
                   </div>
@@ -144,7 +144,7 @@ export function ProfitCalculator() {
                 </label>
                 <label className="block">
                   <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{tx.competitionLevel}</span>
-                  <select value={competition} onChange={(e) => setCompetition(Number(e.target.value) as 1 | 2 | 3 | 4 | 5)} className="mt-1.5 w-full rounded-lg border border-ink-200 bg-white px-2 py-2 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white">
+                  <select value={competition} onChange={(e) => setCompetition(Number(e.target.value) as 1 | 2 | 3 | 4 | 5)} className="mt-1.5 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-2 py-2 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white">
                     {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n} {n === 1 ? `(${tx.low})` : n === 5 ? `(${tx.oversaturated})` : ""}</option>)}
                   </select>
                 </label>

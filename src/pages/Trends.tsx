@@ -10,6 +10,7 @@ import { generateAdLibraryEntries, type AdLibraryEntry } from "../lib/adLibrary"
 import { fetchRealMarketData, isMarketDataBackendConfigured, type RealMarketData, type RealAd, type RealProduct } from "../lib/marketData";
 import { addSaved } from "../lib/storage";
 import { useLanguage, type Lang } from "../lib/i18n";
+import { Stamp, type StampTone } from "../components/logistics";
 
 const PLATFORM_ICON: Record<string, typeof Search> = {
   "Google Trends": BarChart3,
@@ -78,8 +79,14 @@ const TEXT: Record<Lang, TrendsText> = {
   },
 };
 
-function RealBadge({ label }: { label: string }) {
-  return <span className="rounded-full bg-brand-100 px-1.5 py-0.5 text-[10px] font-semibold text-brand-700 dark:bg-brand-950/50 dark:text-brand-300">{label}</span>;
+// Real vs illustrative data is marked with a rubber stamp: violet "official"
+// ink for real data, orange for demo, brown for estimates.
+function RealBadge({ label, tone = "real" }: { label: string; tone?: StampTone }) {
+  return (
+    <Stamp tone={tone} rotate={tone === "real" ? -3 : 3} className="mx-1">
+      {label}
+    </Stamp>
+  );
 }
 
 function countryCodeToFlag(code: string): string {
@@ -108,7 +115,7 @@ function mostCommonCountryCode(products: RealProduct[]): string | null {
 
 function LinkGrid({ links }: { links: ResearchLink[] }) {
   return (
-    <div className="grid gap-2.5 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
       {links.map((l) => {
         const Icon = PLATFORM_ICON[l.platform] ?? ExternalLink;
         return (
@@ -117,7 +124,7 @@ function LinkGrid({ links }: { links: ResearchLink[] }) {
             href={l.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-start gap-3 rounded-xl border border-ink-200 p-3 transition-colors hover:border-brand-400 hover:bg-brand-50/50 dark:border-ink-700 dark:hover:bg-brand-950/20"
+            className="group flex min-w-0 items-start gap-3 rounded-xl border border-ink-200 p-3 transition-colors hover:border-brand-400 hover:bg-brand-50/50 dark:border-ink-700 dark:hover:bg-brand-950/20"
           >
             <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-300">
               <Icon size={15} />
@@ -144,7 +151,7 @@ function AdLibraryGrid({ entries, tx, keyword }: { entries: AdLibraryEntry[]; tx
   return (
     <div className="mt-4">
       <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-400">
-        <Megaphone size={13} /> {tx.adLibraryTitle} <RealBadge label={tx.demoBadge} />
+        <Megaphone size={13} /> {tx.adLibraryTitle} <RealBadge label={tx.demoBadge} tone="demo" />
       </h4>
       <div className="mt-2.5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
         {entries.map((entry) => (
@@ -258,7 +265,7 @@ function MarketDataPanel({ keyword, lang, tx }: { keyword: string; lang: Lang; t
 
       <p className="mt-3 flex items-center gap-1.5 text-sm text-ink-600 dark:text-ink-300">
         <span>{topCountry.flag}</span> {countryLabel}: <strong className="text-ink-900 dark:text-white">{topCountry.name}</strong>
-        {topCountry.source !== "estimate" ? <RealBadge label={tx.realBadge} /> : <span className="text-xs text-ink-400">({tx.estimateLabel})</span>}
+        {topCountry.source !== "estimate" ? <RealBadge label={tx.realBadge} /> : <RealBadge label={tx.estimateLabel} tone="estimate" />}
       </p>
 
       {loading && (
@@ -377,10 +384,10 @@ export function Trends() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={tx.placeholder}
-              className="w-full rounded-xl border border-ink-200 bg-white py-3.5 pl-10 pr-4 text-sm text-ink-900 shadow-sm outline-none placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/30 dark:border-ink-700 dark:bg-ink-900 dark:text-white"
+              className="w-full rounded-xl border-[1.5px] border-ink-950 bg-[#fffdf8] py-3.5 pl-10 pr-4 text-sm text-ink-900 outline-none placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40 dark:border-ink-700 dark:bg-ink-900 dark:text-white"
             />
           </div>
-          <button type="submit" className="rounded-xl bg-brand-600 px-5 py-3.5 text-sm font-semibold text-white shadow-md shadow-brand-900/15 hover:bg-brand-700 whitespace-nowrap">
+          <button type="submit" className="press whitespace-nowrap rounded-md border-2 border-ink-950 bg-brand-400 px-5 py-3.5 font-mono text-[13px] font-bold uppercase tracking-[0.06em] text-ink-950 hover:bg-brand-300 dark:border-brand-400">
             {tx.submit}
           </button>
         </form>
@@ -409,10 +416,10 @@ export function Trends() {
               key={c}
               type="button"
               onClick={() => setCategory(c)}
-              className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-md border-[1.5px] px-3 py-1.5 font-mono text-[12px] font-bold uppercase tracking-[0.06em] transition-colors ${
                 category === c
-                  ? "border-brand-600 bg-brand-600 text-white"
-                  : "border-ink-200 text-ink-600 hover:border-brand-400 dark:border-ink-700 dark:text-ink-300"
+                  ? "border-ink-950 bg-ink-950 text-[#fffdf8] dark:border-ink-100 dark:bg-ink-100 dark:text-ink-950"
+                  : "border-ink-950/25 text-ink-700 hover:border-ink-950 dark:border-ink-600 dark:text-ink-300 dark:hover:border-ink-300"
               }`}
             >
               {c}

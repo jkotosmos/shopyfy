@@ -219,7 +219,7 @@ export function StoreBuilder() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={tx.placeholder}
-            className="w-full rounded-xl border border-ink-200 bg-white px-4 py-3.5 text-sm text-ink-900 shadow-sm outline-none placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/30 dark:border-ink-700 dark:bg-ink-900 dark:text-white"
+            className="w-full rounded-xl border-[1.5px] border-ink-950 bg-[#fffdf8] px-4 py-3.5 text-sm text-ink-900 outline-none placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40 dark:border-ink-700 dark:bg-ink-900 dark:text-white"
           />
           <Button type="submit" disabled={building} className="whitespace-nowrap">
             {building ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
@@ -275,7 +275,7 @@ export function StoreBuilder() {
               <h3 className="mt-2 font-display text-2xl font-semibold text-ink-950 dark:text-white">{result.storeName}</h3>
               <p className="flex items-center gap-1.5 text-sm text-ink-500 dark:text-ink-400"><Globe size={14} /> {result.domainSuggestion}</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant={saved ? "secondary" : "outline"} onClick={handleSave}>
                 <Bookmark size={15} /> {saved ? tx.saved : tx.save}
               </Button>
@@ -394,7 +394,7 @@ export function StoreBuilder() {
               value={shopDomain}
               onChange={(e) => setShopDomain(e.target.value)}
               placeholder={tx.domainPlaceholder}
-              className="mt-3 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-brand-400 dark:border-ink-700 dark:bg-ink-900 dark:text-white"
+              className="mt-3 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm outline-none focus:border-brand-400 dark:border-ink-700 dark:bg-ink-900 dark:text-white"
             />
             <Button type="submit" className="mt-3 w-full" disabled={!isValidShopDomain(shopDomain)}>
               {tx.connectBtn}
@@ -423,7 +423,7 @@ export function StoreBuilder() {
                   <p className="text-ink-600 dark:text-ink-300">{tx.upsellBody}</p>
                   <div className="mt-3 flex gap-2">
                     <Link to="/#pricing" className="flex-1 rounded-lg border border-ink-200 px-3 py-2 text-center text-xs font-semibold text-ink-700 hover:border-brand-400 dark:border-ink-700 dark:text-ink-200">{tx.viewPricing}</Link>
-                    <Link to="/redeem" className="flex-1 rounded-lg bg-brand-600 px-3 py-2 text-center text-xs font-semibold text-white hover:bg-brand-700">{tx.haveCode}</Link>
+                    <Link to="/redeem" className="press flex-1 rounded-md border-2 border-ink-950 bg-brand-400 px-3 py-2 text-center font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-ink-950 hover:bg-brand-300">{tx.haveCode}</Link>
                   </div>
                 </div>
               )

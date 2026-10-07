@@ -88,27 +88,27 @@ export function PolicyGenerator() {
           <form className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{tx.businessName}</span>
-              <input value={inputs.businessName} onChange={(e) => set("businessName", e.target.value)} className="mt-1.5 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
+              <input value={inputs.businessName} onChange={(e) => set("businessName", e.target.value)} className="mt-1.5 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
             </label>
             <label className="block">
               <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{tx.domain}</span>
-              <input value={inputs.domain} onChange={(e) => set("domain", e.target.value)} placeholder="mystore.com" className="mt-1.5 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
+              <input value={inputs.domain} onChange={(e) => set("domain", e.target.value)} placeholder="mystore.com" className="mt-1.5 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
             </label>
             <label className="block">
               <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{tx.contactEmail}</span>
-              <input value={inputs.contactEmail} onChange={(e) => set("contactEmail", e.target.value)} placeholder="support@mystore.com" className="mt-1.5 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
+              <input value={inputs.contactEmail} onChange={(e) => set("contactEmail", e.target.value)} placeholder="support@mystore.com" className="mt-1.5 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
             </label>
             <label className="block">
               <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{tx.country}</span>
-              <input value={inputs.country} onChange={(e) => set("country", e.target.value)} className="mt-1.5 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
+              <input value={inputs.country} onChange={(e) => set("country", e.target.value)} className="mt-1.5 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
             </label>
             <label className="block">
               <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{tx.returnWindow}</span>
-              <input type="number" value={inputs.returnWindowDays} onChange={(e) => set("returnWindowDays", Number(e.target.value) || 0)} className="mt-1.5 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
+              <input type="number" value={inputs.returnWindowDays} onChange={(e) => set("returnWindowDays", Number(e.target.value) || 0)} className="mt-1.5 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
             </label>
             <label className="block">
               <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{tx.processingDays}</span>
-              <input type="number" value={inputs.processingDays} onChange={(e) => set("processingDays", Number(e.target.value) || 0)} className="mt-1.5 w-full rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
+              <input type="number" value={inputs.processingDays} onChange={(e) => set("processingDays", Number(e.target.value) || 0)} className="mt-1.5 w-full rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white" />
             </label>
           </form>
         </Card>

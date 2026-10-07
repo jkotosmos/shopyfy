@@ -194,7 +194,7 @@ export function SiteAnalyzer() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={tx.placeholder}
-              className="w-full rounded-xl border border-ink-200 bg-white py-3.5 pl-10 pr-4 text-sm text-ink-900 shadow-sm outline-none placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/30 dark:border-ink-700 dark:bg-ink-900 dark:text-white"
+              className="w-full rounded-xl border-[1.5px] border-ink-950 bg-[#fffdf8] py-3.5 pl-10 pr-4 text-sm text-ink-900 outline-none placeholder:text-ink-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/40 dark:border-ink-700 dark:bg-ink-900 dark:text-white"
             />
           </div>
           <Button type="submit" className="whitespace-nowrap">{tx.submit}</Button>

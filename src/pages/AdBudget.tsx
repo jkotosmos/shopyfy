@@ -44,7 +44,7 @@ function NumberField({ label, value, onChange, prefix }: { label: string; value:
   return (
     <label className="block">
       <span className="text-sm font-medium text-ink-700 dark:text-ink-300">{label}</span>
-      <div className="mt-1.5 flex items-center rounded-xl border border-ink-200 bg-white px-3 dark:border-ink-700 dark:bg-ink-900">
+      <div className="mt-1.5 flex items-center rounded-xl border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 dark:border-ink-700 dark:bg-ink-900">
         {prefix && <span className="text-sm text-ink-400">{prefix}</span>}
         <input
           type="number"

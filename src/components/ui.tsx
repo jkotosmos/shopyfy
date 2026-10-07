@@ -1,4 +1,5 @@
-import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, CSSProperties, HTMLAttributes, ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { X } from "lucide-react";
 
 export function Container({ className = "", children }: { className?: string; children: ReactNode }) {
@@ -7,22 +8,28 @@ export function Container({ className = "", children }: { className?: string; ch
 
 type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "accent";
 
+const BUTTON_BASE =
+  "inline-flex items-center justify-center gap-2 text-center sm:whitespace-nowrap rounded-md px-5 py-3 font-mono text-[13px] font-bold uppercase tracking-[0.06em] disabled:cursor-not-allowed disabled:opacity-50";
+
+// Hard-edged, ink-bordered buttons with a printed offset shadow that
+// "presses" flat when clicked — like a rubber key, not a glossy pill.
+const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
+  primary: "press border-2 border-ink-950 bg-brand-400 text-ink-950 hover:bg-brand-300 dark:border-brand-400",
+  secondary: "press border-2 border-ink-950 bg-ink-950 text-[#fffdf8] hover:bg-ink-800 dark:border-ink-100 dark:bg-ink-100 dark:text-ink-950 dark:hover:bg-white",
+  outline:
+    "border-2 border-ink-950 bg-transparent text-ink-950 transition-colors hover:bg-ink-950 hover:text-[#fffdf8] dark:border-ink-300 dark:text-ink-100 dark:hover:bg-ink-100 dark:hover:text-ink-950",
+  ghost: "text-ink-700 transition-colors hover:bg-ink-950/5 dark:text-ink-200 dark:hover:bg-white/5",
+  accent: "press border-2 border-ink-950 bg-accent-600 text-white hover:bg-accent-500 dark:border-accent-300",
+};
+
 export function Button({
   variant = "primary",
   className = "",
   children,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: ButtonVariant; children: ReactNode }) {
-  const base = "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all px-5 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed";
-  const variants: Record<ButtonVariant, string> = {
-    primary: "bg-brand-600 text-white shadow-md shadow-brand-900/15 hover:bg-brand-700 hover:-translate-y-0.5 active:translate-y-0",
-    secondary: "bg-ink-950 text-white hover:bg-ink-800 dark:bg-white dark:text-ink-950 dark:hover:bg-ink-100",
-    outline: "border border-ink-300 dark:border-ink-700 text-ink-800 dark:text-ink-100 hover:border-brand-500 hover:text-brand-700 dark:hover:text-brand-400",
-    ghost: "text-ink-600 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800",
-    accent: "bg-accent-500 text-white shadow-md shadow-accent-700/20 hover:bg-accent-600 hover:-translate-y-0.5 active:translate-y-0",
-  };
   return (
-    <button className={`${base} ${variants[variant]} ${className}`} {...rest}>
+    <button className={`${BUTTON_BASE} ${BUTTON_VARIANTS[variant]} ${className}`} {...rest}>
       {children}
     </button>
   );
@@ -39,61 +46,84 @@ export function LinkButton({
   children: ReactNode;
   href: string;
 }) {
-  const base = "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all px-5 py-3 text-sm";
-  const variants: Record<ButtonVariant, string> = {
-    primary: "bg-brand-600 text-white shadow-md shadow-brand-900/15 hover:bg-brand-700 hover:-translate-y-0.5 active:translate-y-0",
-    secondary: "bg-ink-950 text-white hover:bg-ink-800 dark:bg-white dark:text-ink-950 dark:hover:bg-ink-100",
-    outline: "border border-ink-300 dark:border-ink-700 text-ink-800 dark:text-ink-100 hover:border-brand-500 hover:text-brand-700 dark:hover:text-brand-400",
-    ghost: "text-ink-600 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800",
-    accent: "bg-accent-500 text-white shadow-md shadow-accent-700/20 hover:bg-accent-600 hover:-translate-y-0.5 active:translate-y-0",
-  };
+  const cls = `${BUTTON_BASE} ${BUTTON_VARIANTS[variant]} ${className}`;
+  // In-app routes go through the router (no full page reload); hash links
+  // and anything external stay plain anchors so the browser handles them.
+  if (href.startsWith("/") && !href.includes("#")) {
+    return (
+      <Link to={href} className={cls}>
+        {children}
+      </Link>
+    );
+  }
   return (
-    <a href={href} className={`${base} ${variants[variant]} ${className}`}>
+    <a href={href} className={cls}>
       {children}
     </a>
   );
 }
 
+// A printed price-tag sticker rather than a soft pill.
 export function Badge({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border border-brand-300/60 bg-brand-50 px-3 py-1 text-xs font-semibold tracking-wide text-brand-700 dark:border-brand-800 dark:bg-brand-950/40 dark:text-brand-300 ${className}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-sm border-[1.5px] border-ink-950 bg-brand-400 px-2 py-0.5 font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-ink-950 dark:border-brand-400 ${className}`}
+    >
       {children}
     </span>
   );
 }
 
+// Every card is a label stuck on the page: label stock, ink border, die-cut corners.
 export function Card({ className = "", children, ...rest }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      className={`rounded-2xl border border-ink-200/80 bg-white p-6 shadow-[0_1px_2px_rgba(26,24,21,0.04)] dark:border-ink-800 dark:bg-ink-900/60 ${className}`}
-      {...rest}
-    >
+    <div className={`surface-label rounded-2xl border-[1.5px] border-ink-950 p-6 dark:border-ink-700 ${className}`} {...rest}>
       {children}
     </div>
   );
 }
 
-export function Eyebrow({ children }: { children: ReactNode }) {
-  return <p className="mb-3 text-xs font-semibold uppercase tracking-[0.15em] text-accent-600 dark:text-accent-400">{children}</p>;
+// Section eyebrow = an embossed Dymo label-maker strip.
+export function Eyebrow({ children, tone = "ink" }: { children: ReactNode; tone?: "ink" | "paper" }) {
+  return (
+    <p className="mb-5">
+      <span className={`dymo ${tone === "paper" ? "dymo--paper" : ""}`}>{children}</span>
+    </p>
+  );
 }
 
 export function SectionTitle({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <h2 className={`font-display text-3xl sm:text-4xl font-semibold tracking-tight text-ink-950 dark:text-white ${className}`}>{children}</h2>;
+  return (
+    <h2 className={`font-display text-[26px] font-bold leading-[1.12] tracking-[-0.025em] text-ink-950 sm:text-[38px] dark:text-[#f6f1e7] ${className}`}>
+      {children}
+    </h2>
+  );
 }
 
 export function Modal({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-ink-950/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative w-full max-w-md rounded-2xl border border-ink-200 bg-white p-6 shadow-2xl dark:border-ink-800 dark:bg-ink-900">
-        <div className="flex items-start justify-between">
-          <h3 className="font-semibold text-ink-950 dark:text-white">{title}</h3>
-          <button type="button" onClick={onClose} className="rounded-lg p-1 text-ink-400 hover:bg-ink-100 dark:hover:bg-ink-800" aria-label="Закрыть">
+      <div className="absolute inset-0 bg-ink-950/65" onClick={onClose} />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="surface-label animate-stick relative w-full max-w-md rounded-2xl border-2 border-ink-950 shadow-[8px_8px_0_0_var(--color-ink-950)] dark:border-ink-600 dark:shadow-[8px_8px_0_0_#000]"
+        style={{ "--stick-rot": "-0.6deg" } as CSSProperties}
+      >
+        <div className="flex items-center justify-between border-b-2 border-ink-950 px-5 py-3 dark:border-ink-600">
+          <h3 className="font-display text-base font-bold text-ink-950 dark:text-white">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border-[1.5px] border-transparent p-1 text-ink-500 hover:border-ink-950 hover:text-ink-950 dark:hover:border-ink-300 dark:hover:text-white"
+            aria-label="Закрыть"
+          >
             <X size={18} />
           </button>
         </div>
-        <div className="mt-3 text-sm text-ink-600 dark:text-ink-300">{children}</div>
+        <div className="px-5 py-4 text-sm text-ink-600 dark:text-ink-300">{children}</div>
       </div>
     </div>
   );
@@ -102,8 +132,8 @@ export function Modal({ open, onClose, title, children }: { open: boolean; onClo
 export function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="text-center">
-      <div className="font-display text-3xl sm:text-4xl font-semibold text-ink-950 dark:text-white">{value}</div>
-      <div className="mt-1 text-sm text-ink-500 dark:text-ink-400">{label}</div>
+      <div className="font-display text-2xl font-bold tracking-[-0.02em] text-ink-950 sm:text-3xl dark:text-white">{value}</div>
+      <div className="caption mt-1.5">{label}</div>
     </div>
   );
 }

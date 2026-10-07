@@ -1,47 +1,86 @@
 @import "tailwindcss";
 
+/*
+  "Накладная" — a design system built from the physical artifacts of
+  shipping: label paper, ink, signal orange, rubber stamps, barcodes,
+  perforations, packing tape. Dropshipping is literally parcels moving from
+  a supplier to a buyer, so the interface borrows that visual language
+  instead of the usual soft-gradient SaaS look.
+*/
+
 @theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, sans-serif;
-  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Onest Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Unbounded Variable", "Onest Variable", ui-sans-serif, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Deep forest green — primary */
-  --color-brand-50: #eef4ef;
-  --color-brand-100: #dbe9dc;
-  --color-brand-200: #b3d1b6;
-  --color-brand-300: #86b48c;
-  --color-brand-400: #5a9463;
-  --color-brand-500: #35713f;
-  --color-brand-600: #285a32;
-  --color-brand-700: #204628;
-  --color-brand-800: #1a3720;
-  --color-brand-900: #142b1a;
+  /* Die-cut label corners, not pill-shaped SaaS cards */
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 5px;
+  --radius-2xl: 6px;
+  --radius-3xl: 8px;
 
-  /* Warm terracotta — secondary accent, used sparingly */
-  --color-accent-50: #fdf3ee;
-  --color-accent-100: #fbe3d5;
-  --color-accent-200: #f4c2a4;
-  --color-accent-300: #eb9c71;
-  --color-accent-400: #dd7947;
-  --color-accent-500: #c25f30;
-  --color-accent-600: #9f4a25;
-  --color-accent-700: #7c3a1e;
+  /* Signal orange — "international orange" of shipping/priority labels */
+  --color-brand-50: #fff2eb;
+  --color-brand-100: #ffe2d3;
+  --color-brand-200: #ffc2a5;
+  --color-brand-300: #ff9b6f;
+  --color-brand-400: #ff6a33;
+  --color-brand-500: #f2541b;
+  --color-brand-600: #c9410c;
+  --color-brand-700: #a0340c;
+  --color-brand-800: #7a280b;
+  --color-brand-900: #521c09;
+  --color-brand-950: #2e1005;
 
-  /* Warm neutrals instead of cool blue-grays */
-  --color-ink-50: #f7f5f1;
-  --color-ink-100: #efece4;
-  --color-ink-200: #ded8ca;
-  --color-ink-300: #c0b7a2;
-  --color-ink-400: #99907a;
-  --color-ink-500: #746c5c;
-  --color-ink-600: #585244;
-  --color-ink-700: #423d33;
-  --color-ink-800: #2b2822;
-  --color-ink-900: #1a1815;
-  --color-ink-950: #100f0c;
+  /* Stamp violet — the colour of an official ink stamp. Means "verified/real" */
+  --color-accent-50: #eff0ff;
+  --color-accent-100: #e0e3ff;
+  --color-accent-200: #c3c8ff;
+  --color-accent-300: #9ba2ff;
+  --color-accent-400: #7078f5;
+  --color-accent-500: #4b51e0;
+  --color-accent-600: #3a3cc4;
+  --color-accent-700: #2f2f9e;
+  --color-accent-800: #262680;
+  --color-accent-900: #1d1d5c;
+
+  /* Paper → ink (warm, like label stock and printer's ink) */
+  --color-ink-50: #f8f5ef;
+  --color-ink-100: #efe9de;
+  --color-ink-200: #e0d7c7;
+  --color-ink-300: #c6bba6;
+  --color-ink-400: #857b67;
+  --color-ink-500: #6a6253;
+  --color-ink-600: #524b3f;
+  --color-ink-700: #3d372e;
+  --color-ink-800: #29251f;
+  --color-ink-900: #1b1814;
+  --color-ink-950: #12100d;
+
+  /* Cardboard / packing tape */
+  --color-kraft-100: #f3e6cc;
+  --color-kraft-200: #e6cfa5;
+  --color-kraft-300: #d6b47f;
+  --color-kraft-400: #c49b60;
+  --color-kraft-500: #a98047;
+  --color-kraft-600: #8a6635;
+  --color-kraft-700: #6b4f29;
+
+  --color-paper: #ece5d8;
+  --color-label: #fffdf8;
+  --color-night: #13110e;
 }
 
 :root {
   color-scheme: light dark;
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .3  0 0 0 0 .23  0 0 0 0 .15  0 0 0 .6 -.2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --grain-dark: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 .95  0 0 0 0 .85  0 0 0 .4 -.16'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --fibers: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='512' height='256'><filter id='k'><feTurbulence type='fractalNoise' baseFrequency='.0234375 .75' numOctaves='2' seed='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .32  0 0 0 0 .21  0 0 0 0 .1  0 0 0 .7 -.25'/></filter><rect width='100%25' height='100%25' filter='url(%23k)'/></svg>");
+  /* Speckled-ink mask: mostly opaque, with tiny voids where ink missed */
+  --ink-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' seed='11' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -6 4.4'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>");
 }
 
 * {
@@ -54,19 +93,30 @@ html {
 
 body {
   margin: 0;
-  background: #f8f6f1;
-  color: #1a1815;
+  font-family: var(--font-sans);
+  background-color: var(--color-paper);
+  background-image: var(--grain);
+  color: var(--color-ink-950);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 @media (prefers-color-scheme: dark) {
   body {
-    background: #100f0c;
-    color: #eeebe4;
+    background-color: var(--color-night);
+    background-image: var(--grain-dark);
+    color: #ede7da;
   }
 }
 
 ::selection {
-  background: rgba(53, 113, 63, 0.35);
+  background: var(--color-brand-400);
+  color: var(--color-ink-950);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 2px;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -77,18 +127,398 @@ body {
   scrollbar-width: none;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
-}
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
+@layer components {
+
+/* ───────────── Entrance motion ───────────── */
 
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-up {
-  animation: fade-up 0.6s ease-out both;
+  animation: fade-up 0.6s cubic-bezier(.2, .7, .2, 1) both;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* A label being slapped onto a box: drops in slightly rotated, settles */
+@keyframes stick {
+  0% { opacity: 0; transform: translateY(-18px) rotate(var(--stick-rot, -3deg)) scale(1.04); }
+  70% { opacity: 1; transform: translateY(2px) rotate(var(--stick-rot, -3deg)) scale(0.995); }
+  100% { opacity: 1; transform: translateY(0) rotate(var(--stick-rot, -3deg)) scale(1); }
+}
+.animate-stick {
+  animation: stick 0.7s cubic-bezier(.2, .8, .2, 1) both;
+}
+
+/* ───────────── Dymo embossed label (eyebrows) ───────────── */
+
+.dymo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.42em 0.85em 0.38em;
+  border-radius: 3px;
+  background: var(--color-ink-950);
+  color: #fffdf8;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transform: rotate(-1.1deg);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    inset 0 -2px 0 rgb(0 0 0 / 0.45),
+    0 1px 1px rgb(0 0 0 / 0.18);
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.75), 0 -1px 0 rgb(255 255 255 / 0.18);
+}
+.dymo::before {
+  content: "";
+  width: 0.55em;
+  height: 0.55em;
+  background: var(--color-brand-400);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+.dymo--paper {
+  background: #ede7da;
+  color: var(--color-ink-950);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.5);
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.18);
+}
+@media (prefers-color-scheme: dark) {
+  .dymo {
+    background: #ede7da;
+    color: var(--color-ink-950);
+    text-shadow: 0 1px 0 rgb(255 255 255 / 0.5);
+    box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.18);
+  }
+}
+
+/* ───────────── Rubber stamps (real / demo / estimate) ───────────── */
+
+.stamp {
+  --stamp-ink: var(--color-accent-600);
+  --stamp-rot: -4deg;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding: 0.22em 0.6em 0.18em;
+  border: 2px solid var(--stamp-ink);
+  outline: 1px solid var(--stamp-ink);
+  outline-offset: 2px;
+  border-radius: 3px;
+  color: var(--stamp-ink);
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 10px;
+  line-height: 1.25;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transform: rotate(var(--stamp-rot));
+  -webkit-mask-image: var(--ink-mask);
+  mask-image: var(--ink-mask);
+  -webkit-mask-size: 140px;
+  mask-size: 140px;
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+  vertical-align: middle;
+}
+.stamp--real { --stamp-ink: var(--color-accent-600); }
+.stamp--demo { --stamp-ink: var(--color-brand-600); }
+.stamp--estimate { --stamp-ink: var(--color-kraft-700); }
+.stamp--ink { --stamp-ink: var(--color-ink-900); }
+.stamp--lg {
+  font-size: 15px;
+  border-width: 3px;
+  outline-width: 2px;
+  outline-offset: 3px;
+  padding: 0.3em 0.75em 0.24em;
+}
+.stamp--xl {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  border-width: 5px;
+  outline-width: 2px;
+  outline-offset: 5px;
+  padding: 0.12em 0.45em 0.1em;
+  border-radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  .stamp { mix-blend-mode: normal; opacity: 0.95; }
+  .stamp--real { --stamp-ink: var(--color-accent-300); }
+  .stamp--demo { --stamp-ink: var(--color-brand-300); }
+  .stamp--estimate { --stamp-ink: var(--color-kraft-300); }
+  .stamp--ink { --stamp-ink: #ede7da; }
+}
+
+@keyframes stamp-in {
+  0% { opacity: 0; transform: rotate(var(--stamp-rot)) scale(2.1); }
+  55% { opacity: 1; transform: rotate(var(--stamp-rot)) scale(0.9); }
+  75% { transform: rotate(var(--stamp-rot)) scale(1.04); }
+  100% { opacity: 0.9; transform: rotate(var(--stamp-rot)) scale(1); }
+}
+.stamp-thunk {
+  animation: stamp-in 0.42s cubic-bezier(.3, .7, .3, 1) both;
+}
+
+/* ───────────── Packing tape ───────────── */
+
+.tape {
+  position: absolute;
+  z-index: 2;
+  width: 112px;
+  height: 30px;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.1) 0 2px, transparent 2px 7px),
+    linear-gradient(180deg, rgb(255 255 255 / 0.28), rgb(255 255 255 / 0) 45%, rgb(0 0 0 / 0.06)),
+    rgb(214 180 127 / 0.72);
+  box-shadow: 0 1px 2px rgb(60 40 10 / 0.18);
+  clip-path: polygon(
+    0 6%, 3% 0, 6% 9%, 9% 1%, 12% 7%, 88% 2%, 91% 9%, 94% 0, 97% 8%, 100% 3%,
+    100% 95%, 97% 100%, 94% 92%, 91% 100%, 88% 93%, 12% 99%, 9% 91%, 6% 100%, 3% 93%, 0 98%
+  );
+}
+@media (prefers-color-scheme: dark) {
+  .tape { background-color: rgb(169 128 71 / 0.6); }
+}
+
+/* ───────────── Perforation / tear lines ───────────── */
+
+.perf {
+  position: relative;
+  height: 0;
+  border-top: 2px dashed var(--color-ink-300);
+}
+.perf--notched::before,
+.perf--notched::after {
+  content: "";
+  position: absolute;
+  top: -11px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--color-paper);
+  box-shadow: inset 0 0 0 1.5px var(--color-ink-950);
+}
+.perf--notched::before { left: -11px; clip-path: inset(0 0 0 50%); }
+.perf--notched::after { right: -11px; clip-path: inset(0 50% 0 0); }
+@media (prefers-color-scheme: dark) {
+  .perf { border-top-color: var(--color-ink-700); }
+  .perf--notched::before,
+  .perf--notched::after {
+    background: var(--color-night);
+    box-shadow: inset 0 0 0 1.5px var(--color-ink-600);
+  }
+}
+
+/* Torn/zig-zag edges for receipts and the footer */
+.zigzag-y {
+  -webkit-mask:
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 18px 51% repeat-x,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 18px 51% repeat-x;
+  mask:
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 18px 51% repeat-x,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / 18px 51% repeat-x;
+}
+.zigzag-top {
+  -webkit-mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 22px 100% repeat-x;
+  mask: conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / 22px 100% repeat-x;
+}
+
+/* ───────────── Hard "printed" shadows ───────────── */
+
+.press {
+  box-shadow: 3px 3px 0 0 var(--color-ink-950);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.15s ease, color 0.15s ease;
+}
+.press:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 0 var(--color-ink-950);
+}
+.press:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0 0 0 0 var(--color-ink-950);
+}
+@media (prefers-color-scheme: dark) {
+  .press { box-shadow: 3px 3px 0 0 #000; }
+  .press:hover:not(:disabled) { box-shadow: 4px 4px 0 0 #000; }
+}
+
+.lift {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.lift:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 0 var(--color-ink-950);
+}
+@media (prefers-color-scheme: dark) {
+  .lift:hover { box-shadow: 5px 5px 0 0 var(--color-brand-600); }
+}
+
+/* ───────────── Surfaces ───────────── */
+
+.surface-paper {
+  background-color: var(--color-paper);
+  background-image: var(--grain);
+}
+.surface-label {
+  background-color: var(--color-label);
+}
+.surface-kraft {
+  background-color: var(--color-kraft-300);
+  background-image: var(--fibers);
+}
+.surface-grid {
+  background-image:
+    linear-gradient(var(--color-ink-200) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-ink-200) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+@media (prefers-color-scheme: dark) {
+  .surface-paper { background-color: var(--color-night); background-image: var(--grain-dark); }
+  .surface-label { background-color: var(--color-ink-900); }
+  .surface-kraft { background-color: #3a2e1d; }
+  .surface-grid {
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  }
+}
+
+/* Small uppercase mono field caption ("ОТПРАВИТЕЛЬ", "ТРЕК №") */
+.caption {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-500);
+}
+@media (prefers-color-scheme: dark) {
+  .caption { color: var(--color-ink-400); }
+}
+
+/* ───────────── Conveyor ticker ───────────── */
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 48s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ───────────── Parcel travelling a route ───────────── */
+
+@keyframes route-x {
+  0%, 8% { left: 0%; }
+  25%, 33% { left: 33.333%; }
+  50%, 58% { left: 66.666%; }
+  75%, 92% { left: 100%; }
+  100% { left: 100%; opacity: 0; }
+}
+@keyframes route-y {
+  0%, 8% { top: 0%; }
+  25%, 33% { top: 33.333%; }
+  50%, 58% { top: 66.666%; }
+  75%, 92% { top: 100%; }
+  100% { top: 100%; opacity: 0; }
+}
+.parcel-x { animation: route-x 9s cubic-bezier(.6, 0, .3, 1) infinite; }
+.parcel-y { animation: route-y 9s cubic-bezier(.6, 0, .3, 1) infinite; }
+
+/* ───────────── Split-flap board ───────────── */
+
+.flap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.05em;
+  height: 1.45em;
+  margin-right: 2px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #24201b 0 49%, #1a1713 51% 100%);
+  color: #fbf3e4;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 0.06), 0 1px 0 rgb(0 0 0 / 0.35);
+  overflow: hidden;
+}
+.flap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgb(0 0 0 / 0.65);
+}
+@keyframes flap-tick {
+  0% { transform: scaleY(1); }
+  50% { transform: scaleY(0.25); }
+  100% { transform: scaleY(1); }
+}
+.flap > span {
+  display: inline-block;
+  animation: flap-tick 0.09s linear;
+}
+
+/* ───────────── Luggage tag (pricing) ───────────── */
+
+.tag-shape {
+  clip-path: polygon(22px 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%, 0 22px);
+}
+.tag-eyelet {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  border-radius: 999px;
+  background: var(--color-paper);
+  box-shadow: 0 0 0 4px var(--color-kraft-400), 0 0 0 5.5px var(--color-ink-950);
+}
+@media (prefers-color-scheme: dark) {
+  .tag-eyelet {
+    background: var(--color-night);
+    box-shadow: 0 0 0 4px var(--color-kraft-600), 0 0 0 5.5px #000;
+  }
+}
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .parcel-x,
+  .parcel-y,
+  .animate-float {
+    animation: none;
+  }
+  .stamp-thunk,
+  .animate-stick,
+  .animate-fade-up,
+  .flap > span {
+    animation-duration: 1ms;
+  }
 }

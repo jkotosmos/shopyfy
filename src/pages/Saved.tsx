@@ -71,12 +71,12 @@ export function Saved() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={tx.productName}
-              className="rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white sm:col-span-2"
+              className="rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white sm:col-span-2"
             />
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white"
+              className="rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white"
             >
               {NICHES.map((n) => <option key={n.id} value={nicheLabel(n, lang)}>{n.emoji} {nicheLabel(n, lang)}</option>)}
             </select>
@@ -85,7 +85,7 @@ export function Saved() {
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder={tx.note}
-              className="rounded-lg border border-ink-200 bg-white px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white sm:col-span-4"
+              className="rounded-lg border-[1.5px] border-ink-950 bg-[#fffdf8] px-3 py-2.5 text-sm dark:border-ink-700 dark:bg-ink-900 dark:text-white sm:col-span-4"
             />
           </form>
         </Card>
